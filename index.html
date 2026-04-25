@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GabaoIndex — Trouvez tout au Gabon</title>
+  <meta name="description" content="Le répertoire de référence au Gabon. Restaurants, hôtels, parcs nationaux, services, et bien plus à Libreville et partout au Gabon." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <span class="logo-icon">🌿</span>
+        <span class="logo-text">Gabao<strong>Index</strong></span>
+      </a>
+      <div class="nav-actions">
+        <button class="lang-btn" id="langBtn" title="Switch language">FR / EN</button>
+        <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+        <button class="cta-btn" id="addListingBtn">+ Ajouter un lieu</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" id="heroBg">
+      <!-- Slides are injected by app.js -->
+    </div>
+    <div class="hero-content">
+      <p class="hero-eyebrow" data-fr="Découvrez le Gabon" data-en="Discover Gabon">Découvrez le Gabon</p>
+      <h1 class="hero-title" data-fr="Trouvez tout ce dont<br/>vous avez besoin" data-en="Find everything<br/>you need">Trouvez tout ce dont<br/>vous avez besoin</h1>
+      <p class="hero-sub" data-fr="Restaurants, hôtels, parcs, services — partout au Gabon" data-en="Restaurants, hotels, parks, services — all across Gabon">Restaurants, hôtels, parcs, services — partout au Gabon</p>
+      <div class="search-bar" id="searchBar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Rechercher un restaurant, un hôtel, un parc..." autocomplete="off" />
+        <select id="cityFilter">
+          <option value="">Toutes les villes</option>
+          <option value="Libreville">Libreville</option>
+          <option value="Port-Gentil">Port-Gentil</option>
+          <option value="Franceville">Franceville</option>
+          <option value="Lambaréné">Lambaréné</option>
+          <option value="Oyem">Oyem</option>
+          <option value="Mouila">Mouila</option>
+          <option value="Makokou">Makokou</option>
+          <option value="Tchibanga">Tchibanga</option>
+          <option value="Moanda">Moanda</option>
+          <option value="Lastoursville">Lastoursville</option>
+          <option value="Ndjolé">Ndjolé</option>
+          <option value="Booué">Booué</option>
+          <option value="Bitam">Bitam</option>
+          <option value="Lopé">Lopé</option>
+          <option value="Mayumba">Mayumba</option>
+          <option value="Gamba">Gamba</option>
+        </select>
+        <button id="searchBtn" class="search-submit">Rechercher</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">485+</span><span class="stat-label" data-fr="Lieux" data-en="Places">Lieux</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">11</span><span class="stat-label" data-fr="Catégories" data-en="Categories">Catégories</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">15</span><span class="stat-label" data-fr="Villes" data-en="Cities">Villes</span></div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">↓</div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section categories-section" id="categoriesSection">
+    <div class="container">
+      <h2 class="section-title" data-fr="Explorer par catégorie" data-en="Browse by Category">Explorer par catégorie</h2>
+      <div class="categories-grid" id="categoriesGrid"></div>
+    </div>
+  </section>
+
+  <!-- FILTER BAR -->
+  <section class="filter-section" id="filterSection">
+    <div class="container">
+      <div class="filter-bar" id="filterBar"></div>
+    </div>
+  </section>
+
+  <!-- LISTINGS -->
+  <section class="section listings-section" id="listingsSection">
+    <div class="container">
+      <div class="listings-header">
+        <h2 class="section-title" id="listingsTitle" data-fr="Tous les lieux" data-en="All Places">Tous les lieux</h2>
+        <span class="results-count" id="resultsCount"></span>
+      </div>
+      <div class="sort-controls" id="sortControls" style="margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <label style="color: var(--text-secondary); font-size: 14px; margin: 0;" data-fr="Trier par:" data-en="Sort by:">Trier par:</label>
+        <select id="sortSelect" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 14px;" onchange="setSortBy(this.value)">
+          <option value="custom" data-fr="Ordre personnalisé" data-en="Custom Order">Ordre personnalisé</option>
+          <option value="featured" data-fr="Featured d'abord" data-en="Featured First">Featured d'abord</option>
+          <option value="city" data-fr="Par ville" data-en="By City">Par ville</option>
+          <option value="recent" data-fr="Récemment ajouté" data-en="Recently Added">Récemment ajouté</option>
+          <option value="name" data-fr="Alphabétique" data-en="Alphabetic">Alphabétique</option>
+        </select>
+      </div>
+      <div class="listings-grid" id="listingsGrid"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <span class="empty-icon">🔍</span>
+        <p data-fr="Aucun résultat trouvé." data-en="No results found.">Aucun résultat trouvé.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section class="section map-section" id="mapSection">
+    <div class="container">
+      <h2 class="section-title" data-fr="Carte du Gabon" data-en="Map of Gabon">Carte du Gabon</h2>
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">
+        <span class="logo-icon">🌿</span>
+        <span class="logo-text">Gabao<strong>Index</strong></span>
+        <p class="footer-tagline" data-fr="Le répertoire de référence au Gabon" data-en="Gabon's go-to directory">Le répertoire de référence au Gabon</p>
+      </div>
+      <div class="footer-links">
+        <h4>Catégories</h4>
+        <a href="#">Restaurants</a>
+        <a href="#">Hôtels</a>
+        <a href="#">Parcs nationaux</a>
+        <a href="#">Services</a>
+      </div>
+      <div class="footer-links">
+        <h4>Villes</h4>
+        <a href="#">Libreville</a>
+        <a href="#">Port-Gentil</a>
+        <a href="#">Franceville</a>
+        <a href="#">Lambaréné</a>
+        <a href="#">Moanda</a>
+        <a href="#">Oyem</a>
+      </div>
+      <div class="footer-links">
+        <h4>GabaoIndex</h4>
+        <a href="#">À propos</a>
+        <a href="#">Ajouter un lieu</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 GabaoIndex. Fait avec ❤️ pour le Gabon.</p>
+    </div>
+  </footer>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
