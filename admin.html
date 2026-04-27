@@ -16,66 +16,69 @@
     }
 
     /* LOGIN */
-    .login-page {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #1a4027 0%, #0a1a0f 100%);
+    <!-- admin.html - Replace the login form -->
+<div id="login-section">
+  <h2>Admin Access</h2>
+  <form id="admin-login-form">
+    <input type="email" id="admin-email" placeholder="admin@gabaofind.com" required>
+    <input type="password" id="admin-password" placeholder="••••••••" required>
+    <button type="submit">Sign In</button>
+    <p id="login-error" class="error"></p>
+  </form>
+</div>
+
+<div id="admin-panel" style="display:none;">
+  <!-- Your existing admin UI stays here -->
+  <button id="logout-btn">Logout</button>
+  <!-- ... rest of admin panel -->
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+  import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+
+  const loginForm = document.getElementById('admin-login-form');
+  const loginSection = document.getElementById('login-section');
+  const adminPanel = document.getElementById('admin-panel');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  // Auth state observer
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Optional: Check if user is admin via custom claims or email whitelist
+      if (user.email === 'admin@gabaofind.com') {
+        loginSection.style.display = 'none';
+        adminPanel.style.display = 'block';
+        loadAdminData(); // Your existing admin load function
+      } else {
+        signOut(auth);
+        document.getElementById('login-error').textContent = 'Unauthorized email';
+      }
+    } else {
+      loginSection.style.display = 'block';
+      adminPanel.style.display = 'none';
     }
-    .login-box {
-      background: white;
-      padding: 48px;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
+  });
+
+  // Login handler
+  loginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('admin-email').value;
+    const password = document.getElementById('admin-password').value;
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // onAuthStateChanged will handle UI update
+    } catch (error) {
+      document.getElementById('login-error').textContent = 
+        error.code === 'auth/invalid-credential' ? 'Invalid email or password' : 'Login failed';
     }
-    .login-box h1 {
-      font-size: 32px;
-      color: #1a4027;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-    .login-box p {
-      color: #64748b;
-      margin-bottom: 32px;
-      font-size: 16px;
-    }
-    .login-box input {
-      width: 100%;
-      padding: 14px 16px;
-      margin-bottom: 24px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.2s;
-    }
-    .login-box input:focus {
-      outline: none;
-      border-color: #1a4027;
-      box-shadow: 0 0 0 3px rgba(26, 64, 39, 0.1);
-    }
-    .login-box button {
-      width: 100%;
-      padding: 14px;
-      background: #1a4027;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.2s;
-    }
-    .login-box button:hover { background: #0f2d18; }
-    .login-error {
-      color: #dc2626;
-      font-size: 14px;
-      margin-top: -16px;
-      margin-bottom: 16px;
-    }
+  });
+
+  // Logout handler
+  logoutBtn?.addEventListener('click', () => signOut(auth));
+</script>
 
     /* ADMIN LAYOUT */
     .admin-page {
