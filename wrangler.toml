@@ -4,23 +4,5 @@ pages_build_output_dir = "."
 
 # Optional: Environment variables for Firebase (if using Workers)
 # [vars]
-# FIREBASE_API_KEY = "your-key"
+# FIREBASE_API_KEY = "AIzaSyCnev6qdlNhgm4_WKPL1n5erz_C15H7JaI"
 
-# Redirects (replaces _redirects)
-[[redirects]]
-  from = "/api/*"
-  to = "/api/:splat"
-  status = 200
-
-# Headers for PWA/security
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-
-[[headers]]
-  for = "/manifest.json"
-  [headers.values]
-    Content-Type = "application/manifest+json"
