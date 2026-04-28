@@ -11,7 +11,7 @@ const firebaseConfig = {
   storageBucket: "gabaoindex.appspot.com",
   messagingSenderId: "120284081903",
   appId: "1:120284081903:web:27d8a1e474f9a41e1ff51a"
-  measurementId: "G-PELRPTFZZG"
+  measurementId: "G-PELRPTFZZG", //
 };
 
 // Initialize Firebase
