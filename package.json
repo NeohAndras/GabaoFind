@@ -1,8 +1,14 @@
 {
-  "dependencies": {
-    "jsdom": "^29.0.2",
-    "express": "^4.18.2"
+  "name": "gabaoindex",
+  "version": "1.0.0",
+  "description": "GabaoIndex - Gabon business directory",
   "scripts": {
-  "build": "echo 'npm run build'"
-}
+    "build": "echo 'No build step required'",
+    "start": "node admin-server.js",
+    "dev": "npx serve ."
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsdom": "^29.0.2"
+  }
 }
