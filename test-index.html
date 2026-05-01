@@ -187,7 +187,111 @@
     }
     .hero-scroll-hint { display: none; }
 
-    .shell-topline, .hero-side, .quick-card, .trust-row, .app-footer-note, .users-section { display: none; }
+    .users-section {
+      width: 100%;
+      padding: 34px 0 10px;
+    }
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+    .user-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(14px);
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+    .user-card-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .user-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(61,166,90,.22), rgba(240,188,46,.16));
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .user-meta {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+    }
+    .user-name {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-role {
+      color: var(--text-secondary);
+      font-size: .86rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-note {
+      color: var(--text-muted);
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+    .user-stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .user-stat {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: .76rem;
+      white-space: nowrap;
+    }
+    .user-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .user-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: .84rem;
+      font-weight: 700;
+    }
+    .user-action.primary {
+      background: linear-gradient(135deg, var(--green-500), var(--green-400));
+      color: #fff;
+    }
+    .user-action.secondary {
+      background: rgba(255,255,255,.06);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .shell-topline, .hero-side, .quick-card, .trust-row, .app-footer-note { display: none; }
     .browse-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -278,32 +382,6 @@
         display: inline-flex;
         white-space: nowrap;
       }
-      .nav-label {
-        display: none;
-      }
-      .nav-icon {
-        display: none;
-      }
-      .logo-text {
-        display: none;
-      }
-      .logo-image {
-        display: block;
-      }
-      .logo {
-        gap: 0;
-      }
-      .auth-btn,
-      .cta-btn,
-      .theme-btn,
-      .lang-btn {
-        min-width: 40px;
-        justify-content: center;
-      }
-      .auth-btn,
-      .cta-btn {
-        gap: 0;
-      }
     }
   </style>
   <script>
@@ -321,18 +399,14 @@
   <nav class="navbar" id="navbar">
     <div class="nav-inner">
       <a href="#" class="logo" aria-label="GabaoIndex Home">
-        <img class="logo-image" src="/img/Logo-Index.webp" alt="GabaoIndex" />
+        <span class="logo-icon">🌿</span>
         <span class="logo-text">Gabao<strong>Index</strong></span>
       </a>
       <div class="nav-actions">
-        <button class="theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">🌙</button>
-        <button class="auth-btn" id="authBtn" aria-label="Login or register">
-          <span class="nav-icon">👤</span><span class="nav-label">Login / Register</span>
-        </button>
-        <button class="cta-btn" id="addListingBtn" aria-label="Ajouter un lieu">
-          <span class="nav-icon">📍</span><span class="nav-label">Ajouter un lieu</span>
-        </button>
-        <button class="lang-btn" id="langBtn" title="Switch language" aria-label="Switch language">🇫🇷 / 🇬🇧</button>
+        <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+        <button class="auth-btn" id="authBtn">👤 Login / Register</button>
+        <button class="cta-btn" id="addListingBtn">+ Ajouter un lieu</button>
+        <button class="lang-btn" id="langBtn" title="Switch language">🇫🇷 / 🇬🇧</button>
       </div>
     </div>
   </nav>
@@ -381,6 +455,94 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="users-section">
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Utilisateurs de test</h2>
+            <p>Contenu factice pour valider l'affichage des profils, des notes et des actions avant de brancher la vraie API.</p>
+          </div>
+        </div>
+        <div class="users-grid">
+          <article class="user-card">
+            <div class="user-card-head">
+              <div class="user-avatar">👩‍💼</div>
+              <div class="user-meta">
+                <div class="user-name">Aline M.</div>
+                <div class="user-role">Cliente vérifiée</div>
+              </div>
+            </div>
+            <div class="user-note">A aimé plusieurs restaurants à Libreville et laisse des avis détaillés après chaque visite.</div>
+            <div class="user-stats">
+              <span class="user-stat">12 avis</span>
+              <span class="user-stat">4.8/5 moyenne</span>
+            </div>
+            <div class="user-actions">
+              <a href="#" class="user-action primary">Voir le profil</a>
+              <a href="#" class="user-action secondary">Ajouter un avis</a>
+            </div>
+          </article>
+
+          <article class="user-card">
+            <div class="user-card-head">
+              <div class="user-avatar">👨‍💻</div>
+              <div class="user-meta">
+                <div class="user-name">Jean P.</div>
+                <div class="user-role">Explorateur local</div>
+              </div>
+            </div>
+            <div class="user-note">Publie des notations sur les hôtels, les parcs et les services utiles pour les voyageurs.</div>
+            <div class="user-stats">
+              <span class="user-stat">8 avis</span>
+              <span class="user-stat">Badge actif</span>
+            </div>
+            <div class="user-actions">
+              <a href="#" class="user-action primary">Voir le profil</a>
+              <a href="#" class="user-action secondary">Ajouter un avis</a>
+            </div>
+          </article>
+
+          <article class="user-card">
+            <div class="user-card-head">
+              <div class="user-avatar">🧑‍🍳</div>
+              <div class="user-meta">
+                <div class="user-name">Mireille K.</div>
+                <div class="user-role">Critique food</div>
+              </div>
+            </div>
+            <div class="user-note">Concentre ses notes sur les établissements culinaires et les expériences gastronomiques.</div>
+            <div class="user-stats">
+              <span class="user-stat">24 avis</span>
+              <span class="user-stat">Top contributrice</span>
+            </div>
+            <div class="user-actions">
+              <a href="#" class="user-action primary">Voir le profil</a>
+              <a href="#" class="user-action secondary">Ajouter un avis</a>
+            </div>
+          </article>
+
+          <article class="user-card">
+            <div class="user-card-head">
+              <div class="user-avatar">🧭</div>
+              <div class="user-meta">
+                <div class="user-name">Omar S.</div>
+                <div class="user-role">Voyageur Gabon</div>
+              </div>
+            </div>
+            <div class="user-note">Aime noter les lieux par ville et partager des recommandations utiles à la communauté.</div>
+            <div class="user-stats">
+              <span class="user-stat">31 avis</span>
+              <span class="user-stat">Membre premium</span>
+            </div>
+            <div class="user-actions">
+              <a href="#" class="user-action primary">Voir le profil</a>
+              <a href="#" class="user-action secondary">Ajouter un avis</a>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -444,7 +606,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-logo">
-        <img class="logo-image" src="/img/Logo-Index.webp" alt="GabaoIndex" />
+        <span class="logo-icon">🌿</span>
         <span class="logo-text">Gabao<strong>Index</strong></span>
         <p class="footer-tagline" data-fr="Le répertoire de référence au Gabon" data-en="Gabon's go-to directory">Le répertoire de référence au Gabon</p>
       </div>

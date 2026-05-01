@@ -6,15 +6,21 @@ service cloud.firestore {
     match /listings/{listingId} {
       allow read: if true;
       allow write: if request.auth != null && 
-                   request.auth.token.email == 'admin@gabaofind.com';
+                   request.auth.token.email == 'admin@gabaoindex.com';
       allow create: if request.auth != null &&
-                    request.auth.token.email == 'admin@gabaofind.com';
+                    request.auth.token.email == 'admin@gabaoindex.com';
+    }
+    
+    // Admin content: admin only
+    match /site_content/{docId} {
+      allow read, write: if request.auth != null &&
+                         request.auth.token.email == 'admin@gabaoindex.com';
     }
     
     // Admin logs: admin only
     match /admin_logs/{logId} {
       allow read, write: if request.auth != null &&
-                         request.auth.token.email == 'admin@gabaofind.com';
+                         request.auth.token.email == 'admin@gabaoindex.com';
     }
     
     // Block all other collections by default

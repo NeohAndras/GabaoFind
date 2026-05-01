@@ -1,7 +1,7 @@
 // firebase-config.js
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -19,13 +19,6 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-// Enable offline persistence for PWA
-enableIndexedDbPersistence(db).catch((err) => {
-  if (err.code === 'failed-precondition') {
-    console.warn('⚠️ Multiple tabs open – persistence limited');
-  } else if (err.code === 'unimplemented') {
-    console.warn('⚠️ Browser doesn\'t support offline persistence');
-  }
-});
+// Lazy loading is handled at the component level with loading="lazy" on images.
 
 export { app };

@@ -8,7 +8,7 @@ function t(fr, en) { return i18n.lang === 'fr' ? fr : en; }
 
 import { loadContent, normalizeContent } from './content-store.js';
 import { auth, db } from './firebase-config.js';
-import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+import { signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
 import { collection, doc, addDoc, getDocs, query, where, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
 // --- DATA ---
@@ -16,7 +16,7 @@ let HERO_SLIDES = [];
 let CATEGORIES = [];
 let LISTINGS = [];
 let BRAND = {
-  logoUrl: '/img/Logo-Index.webp',
+  logoUrl: '',
   logoText: 'GabaoIndex',
   logoIcon: '🌿',
   taglineFr: 'Le répertoire de référence au Gabon',
@@ -66,7 +66,6 @@ let authInitialized = false;
 let reviewsByListingId = {};
 let reviewsLoading = false;
 const googleProvider = new GoogleAuthProvider();
-const ADMIN_EMAIL = 'admin@gabaoindex.com';
 
 function getCatMeta(id) { return CATEGORIES.find(c => c.id === id) || { icon: '📍', label: { fr: id, en: id } }; }
 
@@ -100,9 +99,8 @@ function getFiltered() {
 function renderBrand() {
   const logoText = BRAND.logoText || 'GabaoIndex';
   const logoIcon = BRAND.logoIcon || '🌿';
-  const logoUrl = BRAND.logoUrl || '/img/Logo-Index.webp';
-  const logoHtml = logoUrl
-    ? `<img src="${logoUrl}" alt="${logoText}" class="logo-image" />`
+  const logoHtml = BRAND.logoUrl
+    ? `<img src="${BRAND.logoUrl}" alt="${logoText}" style="width:28px;height:28px;object-fit:contain;border-radius:6px;" />`
     : `<span class="logo-icon">${logoIcon}</span>`;
 
   document.querySelectorAll('.logo').forEach(el => {
@@ -551,12 +549,9 @@ function renderAuthState() {
   const authBtn = document.getElementById('authBtn');
   if (!authBtn) return;
   if (currentUser) {
-    const isAdmin = currentUser.email === ADMIN_EMAIL;
-    authBtn.textContent = isAdmin ? '👤 Admin' : `👤 ${currentUser.displayName || currentUser.email || 'Account'}`;
-    authBtn.setAttribute('aria-label', isAdmin ? 'Open admin page' : 'Open account page');
+    authBtn.textContent = `👤 ${currentUser.displayName || currentUser.email || 'Account'}`;
   } else {
-    authBtn.textContent = '👤 Connexion';
-    authBtn.setAttribute('aria-label', 'Login or register');
+    authBtn.textContent = '👤 Login / Register';
   }
 }
 
@@ -566,8 +561,15 @@ async function handleLoginClick() {
     currentUser = result.user;
     renderAuthState();
   } catch (error) {
-    console.error('Login failed', error);
-    alert(i18n.lang === 'fr' ? 'Connexion Firebase impossible.' : 'Firebase login failed.');
+    console.warn('Popup login failed, falling back to redirect', error);
+    try {
+      await signInWithRedirect(auth, googleProvider);
+    } catch (redirectError) {
+      console.error('Login failed', redirectError);
+      alert(i18n.lang === 'fr'
+        ? 'Connexion impossible. Vérifiez que Google Auth est activé dans Firebase et que localhost est autorisé.'
+        : 'Login failed. Check that Google Auth is enabled in Firebase and localhost is authorized.');
+    }
   }
 }
 
@@ -583,8 +585,7 @@ async function loadSiteContent() {
     LISTINGS = stored.listings;
     BRAND = {
       ...BRAND,
-      ...stored.brand,
-      logoUrl: stored.brand?.logoUrl || BRAND.logoUrl || '/img/Logo-Index.webp'
+      ...stored.brand
     };
   } catch (error) {
     console.warn('Content load failed, falling back to bundled data.json', error);
@@ -595,8 +596,7 @@ async function loadSiteContent() {
     LISTINGS = data.listings;
     BRAND = {
       ...BRAND,
-      ...data.brand,
-      logoUrl: data.brand?.logoUrl || BRAND.logoUrl || '/img/Logo-Index.webp'
+      ...data.brand
     };
   }
 }
@@ -654,14 +654,22 @@ async function init() {
         await loadReviewsForAllVisibleListings();
       }
     });
+
+    try {
+      const redirectResult = await getRedirectResult(auth);
+      if (redirectResult?.user) {
+        currentUser = redirectResult.user;
+        renderAuthState();
+        await loadReviewsForAllVisibleListings();
+      }
+    } catch (error) {
+      console.warn('No redirect login result', error);
+    }
     document.getElementById('authBtn').addEventListener('click', async () => {
       if (currentUser) {
-        window.location.href = currentUser.email === ADMIN_EMAIL ? '/admin.html' : '/profile.html';
+        await handleLogoutClick();
       } else {
         await handleLoginClick();
-        if (currentUser) {
-          window.location.href = currentUser.email === ADMIN_EMAIL ? '/admin.html' : '/profile.html';
-        }
       }
     });
     initHero();

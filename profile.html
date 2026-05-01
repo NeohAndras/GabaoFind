@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark light" />
+  <title>GabaoIndex — Mon profil</title>
+  <meta name="description" content="Gérez votre profil GabaoIndex, vos avis et vos informations de compte." />
+  <meta name="theme-color" content="#0f2d18" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background: var(--bg); color: var(--text-primary); font-family: 'Inter', sans-serif; }
+    .shell { min-height:100vh; display:grid; grid-template-rows:auto 1fr auto; }
+    .topbar { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(16px); background: rgba(8,18,10,.72); border-bottom: 1px solid rgba(255,255,255,.08); }
+    .topbar-inner { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { display:flex; align-items:center; gap:10px; color:var(--text-primary); text-decoration:none; font-weight:800; }
+    .brand strong { color: var(--accent); }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .btn-link { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:0 14px; border-radius:999px; text-decoration:none; font-weight:700; border:1px solid var(--border); color:var(--text-primary); background:rgba(255,255,255,.04); }
+    .btn-primary { background: linear-gradient(135deg, var(--green-500), var(--green-400)); color:#fff; border-color: transparent; }
+    .hero { max-width: 1200px; margin: 0 auto; padding: 40px 24px 24px; }
+    .hero-grid { display:grid; grid-template-columns: 1.15fr .85fr; gap: 18px; align-items:start; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow-card);
+      padding: 24px;
+      backdrop-filter: blur(16px);
+    }
+    .profile {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      min-height: 100%;
+      display: grid;
+      gap: 20px;
+    }
+    .profile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(61,166,90,.16), transparent 38%),
+                  radial-gradient(circle at bottom left, rgba(240,188,46,.12), transparent 32%);
+      pointer-events: none;
+    }
+    .profile > * { position: relative; z-index: 1; }
+    .profile-top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .avatar {
+      width: 104px;
+      height: 104px;
+      border-radius: 30px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(61,166,90,.22), rgba(240,188,46,.16));
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 2.35rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    }
+    .avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+    .profile-copy { display: grid; gap: 8px; min-width: 0; }
+    .name { font-family: var(--font-head); font-size: clamp(1.7rem, 3vw, 2.25rem); font-weight:800; line-height:1.05; }
+    .role {
+      color: var(--green-300);
+      font-size: .92rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .bio {
+      color: var(--text-secondary);
+      line-height:1.7;
+      font-size: .98rem;
+      max-width: 52ch;
+    }
+    .quick-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .quick-actions .btn-link { min-width: 140px; }
+    .status-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: .88rem;
+      font-weight: 600;
+    }
+    .stats { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .stat {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .stat strong { display:block; font-size:1.25rem; margin-bottom:4px; }
+    .stat span { color: var(--text-secondary); font-size:.86rem; }
+    .form-grid { display:grid; gap:12px; }
+    label { color: var(--text-secondary); font-size:.9rem; display:grid; gap:8px; }
+    input, textarea {
+      width:100%;
+      padding:12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--text-primary);
+      font: inherit;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .section-title { font-family: var(--font-head); font-size: 1.2rem; font-weight:800; margin-bottom: 14px; }
+    .list { display:grid; gap:12px; }
+    .review {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+      display: grid;
+      gap: 10px;
+    }
+    .review-head {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .review-title { display:grid; gap:4px; min-width: 0; }
+    .review-title strong { font-size: 1rem; line-height: 1.2; }
+    .review-meta { color: var(--text-muted); font-size: .84rem; }
+    .review-rating {
+      color: var(--gold-400);
+      font-size: .95rem;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+    .review-body {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: .95rem;
+    }
+    .review-footer {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .review-chip {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: .84rem;
+      font-weight: 600;
+    }
+    .muted { color: var(--text-muted); }
+    .empty { color: var(--text-muted); padding: 12px 0; }
+    .toolbar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom: 16px; }
+    .toolbar > * { flex:1; min-width:220px; }
+    @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) {
+      .topbar-inner, .hero { padding-left: 16px; padding-right: 16px; }
+      .card { padding: 18px; border-radius: 22px; }
+      .profile { padding: 18px; gap: 16px; }
+      .profile-top { align-items: flex-start; gap: 14px; }
+      .avatar { width: 80px; height: 80px; border-radius: 22px; font-size: 2rem; }
+      .name { font-size: 1.45rem; }
+      .role { font-size: .8rem; }
+      .bio { font-size: .92rem; }
+      .status-row { gap: 8px; }
+      .status-pill { width: 100%; justify-content: center; }
+      .stats { grid-template-columns: 1fr; }
+      .stat { padding: 12px; }
+      .actions { width: 100%; justify-content: flex-end; }
+      .btn-link.mobile-only { display:inline-flex; }
+      .btn-link.desktop-only { display:none; }
+      .quick-actions { flex-direction: column; }
+      .quick-actions .btn-link { width: 100%; min-width: 0; }
+      .review { padding: 16px; }
+      .review-footer { align-items:flex-start; }
+      .toolbar > * { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="/index.html" aria-label="GabaoIndex Home">🌿 Gabao<strong>Index</strong></a>
+        <div class="actions" id="headerActions">
+          <a class="btn-link desktop-only" href="/users.html">Utilisateurs</a>
+          <a class="btn-link desktop-only" href="/index.html">Accueil</a>
+          <a class="btn-link desktop-only" id="adminLink" href="/admin.html" style="display:none;">Admin</a>
+          <button class="btn-link btn-primary" id="authBtn">Se connecter</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="hero">
+      <div class="hero-grid">
+        <section class="card profile">
+          <div class="profile-top">
+            <div class="avatar" id="avatar">👤</div>
+            <div class="profile-copy">
+              <div class="name" id="displayName">Mon profil</div>
+              <div class="role" id="role">Invité</div>
+              <div class="bio" id="bio">Connectez-vous pour synchroniser votre profil, vos avis et vos préférences.</div>
+            </div>
+          </div>
+          <div class="status-row">
+            <span class="status-pill" id="cityValue">Ville · —</span>
+            <span class="status-pill" id="memberSince">Membre depuis · —</span>
+            <span class="status-pill">Profil GabaoIndex</span>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong id="reviewCount">0</strong><span>Avis publiés</span></div>
+            <div class="stat"><strong id="savedCount">0</strong><span>Lieu sauvegardé</span></div>
+            <div class="stat"><strong id="activityCount">0</strong><span>Actions récentes</span></div>
+          </div>
+          <div class="quick-actions">
+            <button class="btn-link btn-primary" id="profileEditBtn" type="button">Modifier le profil</button>
+            <button class="btn-link" id="scrollReviewsBtn" type="button">Voir mes avis</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Informations du compte</div>
+          <div class="form-grid">
+            <label>Nom affiché
+              <input id="fullName" type="text" placeholder="Votre nom affiché" />
+            </label>
+            <label>Ville
+              <input id="city" type="text" placeholder="Libreville" />
+            </label>
+            <label>Photo de profil
+              <input id="photoUrl" type="url" placeholder="URL de votre photo" />
+            </label>
+            <label>Rôle
+              <input id="userRole" type="text" placeholder="Contributeur" />
+            </label>
+            <label style="grid-column:1 / -1;">Bio
+              <textarea id="bioInput" placeholder="Parlez un peu de vous..."></textarea>
+            </label>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-link btn-primary" id="saveProfileBtn">Enregistrer</button>
+            <button class="btn-link" id="logoutBtn">Déconnexion</button>
+          </div>
+        </section>
+      </div>
+
+      <div style="margin-top:18px;" class="hero-grid">
+        <section class="card">
+          <div class="section-title">Mes avis récents</div>
+          <div class="toolbar">
+            <input id="reviewSearch" type="search" placeholder="Rechercher dans mes avis..." />
+          </div>
+          <div class="list" id="reviewsList"></div>
+          <div class="empty" id="reviewsEmpty" style="display:none;">Aucun avis pour le moment.</div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Activité récente</div>
+          <div class="list" id="activityList"></div>
+          <div class="empty" id="activityEmpty" style="display:none;">Aucune activité enregistrée.</div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+    import { collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+    const provider = new GoogleAuthProvider();
+    const authBtn = document.getElementById('authBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    const adminLink = document.getElementById('adminLink');
+    const profileEditBtn = document.getElementById('profileEditBtn');
+    const scrollReviewsBtn = document.getElementById('scrollReviewsBtn');
+
+    const avatar = document.getElementById('avatar');
+    const displayName = document.getElementById('displayName');
+    const role = document.getElementById('role');
+    const bio = document.getElementById('bio');
+    const reviewCount = document.getElementById('reviewCount');
+    const cityValue = document.getElementById('cityValue');
+    const memberSince = document.getElementById('memberSince');
+    const savedCount = document.getElementById('savedCount');
+    const activityCount = document.getElementById('activityCount');
+
+    const fullName = document.getElementById('fullName');
+    const city = document.getElementById('city');
+    const photoUrl = document.getElementById('photoUrl');
+    const userRole = document.getElementById('userRole');
+    const bioInput = document.getElementById('bioInput');
+
+    const reviewsList = document.getElementById('reviewsList');
+    const reviewsEmpty = document.getElementById('reviewsEmpty');
+    const activityList = document.getElementById('activityList');
+    const activityEmpty = document.getElementById('activityEmpty');
+    const reviewSearch = document.getElementById('reviewSearch');
+
+    let currentUser = null;
+    let profile = null;
+    let reviews = [];
+    let activity = [];
+
+    function formatDate(value) {
+      if (!value) return '—';
+      const date = value.toDate ? value.toDate() : new Date(value);
+      return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    }
+
+    function renderUser() {
+      const name = profile?.displayName || currentUser?.displayName || currentUser?.email || 'Invité';
+      const userBio = profile?.bio || 'Connectez-vous pour synchroniser votre profil, vos avis et vos préférences.';
+      const userPhoto = profile?.photoUrl || currentUser?.photoURL || '';
+      const userCity = profile?.city || '—';
+      const userRoleValue = profile?.role || 'Contributeur';
+
+      displayName.textContent = name;
+      role.textContent = userRoleValue;
+      bio.textContent = userBio;
+      cityValue.textContent = userCity;
+      reviewCount.textContent = String(reviews.length);
+      memberSince.textContent = profile?.createdAt ? formatDate(profile.createdAt) : '—';
+
+      avatar.innerHTML = userPhoto
+        ? `<img src="${userPhoto}" alt="${name}" style="width:100%;height:100%;object-fit:cover;" />`
+        : '👤';
+
+      fullName.value = profile?.displayName || currentUser?.displayName || '';
+      city.value = profile?.city || '';
+      photoUrl.value = profile?.photoUrl || currentUser?.photoURL || '';
+      userRole.value = profile?.role || 'Contributeur';
+      bioInput.value = profile?.bio || '';
+    }
+
+    function renderReviews() {
+      const q = reviewSearch.value.trim().toLowerCase();
+      const filtered = reviews.filter((review) => {
+        const text = [review.comment, review.listingName, review.city].filter(Boolean).join(' ').toLowerCase();
+        return !q || text.includes(q);
+      });
+
+      reviewsEmpty.style.display = filtered.length ? 'none' : 'block';
+      reviewsList.innerHTML = filtered.map((review) => {
+        const stars = '★'.repeat(review.rating || 0).padEnd(5, '☆');
+        return `
+        <article class="review">
+          <div class="review-head">
+            <div class="review-title">
+              <strong>${review.listingName || 'Lieu'}</strong>
+              <span class="review-meta">${review.city || 'Gabon'} · ${formatDate(review.createdAt)}</span>
+            </div>
+            <span class="review-rating">${stars}</span>
+          </div>
+          <div class="review-body">${review.comment || ''}</div>
+          <div class="review-footer">
+            <span class="review-chip">⭐ ${review.rating || 0}/5</span>
+            <span class="muted">Avis publié</span>
+          </div>
+        </article>
+      `;
+      }).join('');
+    }
+
+    function renderActivity() {
+      activityEmpty.style.display = activity.length ? 'none' : 'block';
+      activityList.innerHTML = activity.map((item) => `
+        <article class="review">
+          <div class="review-head">
+            <div class="review-title">
+              <strong>${item.type || 'Activité'}</strong>
+              <span class="review-meta">${formatDate(item.createdAt)}</span>
+            </div>
+            <span class="review-rating">●</span>
+          </div>
+          <div class="review-body">${item.message || ''}</div>
+          <div class="review-footer">
+            <span class="review-chip">⏱ Activité</span>
+            <span class="muted">Dernière mise à jour</span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    async function loadProfile(uid) {
+      const snap = await getDoc(doc(db, 'user_profiles', uid));
+      profile = snap.exists() ? snap.data() : {
+        uid,
+        displayName: currentUser?.displayName || '',
+        email: currentUser?.email || '',
+        photoUrl: currentUser?.photoURL || '',
+        role: 'Contributeur',
+        city: '',
+        bio: '',
+        createdAt: serverTimestamp()
+      };
+    }
+
+    async function loadReviews(uid) {
+      const snap = await getDocs(query(collection(db, 'reviews'), where('authorUid', '==', uid), orderBy('createdAt', 'desc'), limit(20)));
+      reviews = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    }
+
+    async function loadActivity(uid) {
+      const snap = await getDocs(query(collection(db, 'user_activity'), where('uid', '==', uid), orderBy('createdAt', 'desc'), limit(10)));
+      activity = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    }
+
+    async function saveProfile() {
+      if (!currentUser) return;
+      const next = {
+        uid: currentUser.uid,
+        email: currentUser.email || '',
+        displayName: fullName.value.trim() || currentUser.displayName || currentUser.email || 'Utilisateur',
+        city: city.value.trim(),
+        photoUrl: photoUrl.value.trim(),
+        role: userRole.value.trim() || 'Contributeur',
+        bio: bioInput.value.trim(),
+        updatedAt: serverTimestamp(),
+        createdAt: profile?.createdAt || serverTimestamp()
+      };
+
+      profile = next;
+      await setDoc(doc(db, 'user_profiles', currentUser.uid), next, { merge: true });
+      await setDoc(doc(db, 'user_activity', `${currentUser.uid}-profile`), {
+        uid: currentUser.uid,
+        type: 'Profil mis à jour',
+        message: 'Vos informations de compte ont été enregistrées.',
+        createdAt: serverTimestamp()
+      }, { merge: true });
+      await refreshData();
+    }
+
+    async function refreshData() {
+      if (!currentUser) return;
+      await Promise.all([loadProfile(currentUser.uid), loadReviews(currentUser.uid), loadActivity(currentUser.uid)]);
+      renderUser();
+      renderReviews();
+      renderActivity();
+    }
+
+    function renderAuthState() {
+      if (!authBtn) return;
+      if (currentUser) {
+        const isAdmin = currentUser.email === 'admin@gabaoindex.com';
+        authBtn.textContent = isAdmin ? '👤 Admin' : `👤 ${currentUser.displayName || currentUser.email || 'Compte'}`;
+        authBtn.setAttribute('aria-label', isAdmin ? 'Open admin page' : 'Open account page');
+      } else {
+        authBtn.textContent = 'Se connecter';
+        authBtn.setAttribute('aria-label', 'Login or register');
+      }
+    }
+
+    async function login() {
+      const result = await signInWithPopup(auth, provider);
+      currentUser = result.user;
+      renderAuthState();
+      window.location.href = currentUser.email === 'admin@gabaoindex.com' ? '/admin.html' : '/profile.html';
+    }
+
+    async function logout() {
+      await signOut(auth);
+    }
+
+    authBtn.addEventListener('click', async () => {
+      if (currentUser) {
+        window.location.href = currentUser.email === 'admin@gabaoindex.com' ? '/admin.html' : '/profile.html';
+        return;
+      }
+      await login();
+    });
+    logoutBtn.addEventListener('click', logout);
+    saveProfileBtn.addEventListener('click', saveProfile);
+    reviewSearch.addEventListener('input', renderReviews);
+    profileEditBtn.addEventListener('click', () => document.querySelector('.card .form-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    scrollReviewsBtn.addEventListener('click', () => document.getElementById('reviewsList')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user || null;
+      renderAuthState();
+      if (!currentUser) {
+        profile = null;
+        reviews = [];
+        activity = [];
+        renderUser();
+        renderReviews();
+        renderActivity();
+        return;
+      }
+
+      try {
+        await refreshData();
+      } catch (error) {
+        console.warn('Failed to load profile data', error);
+      }
+    });
+
+    renderAuthState();
+    renderUser();
+    renderReviews();
+    renderActivity();
+  </script>
+</body>
+</html>

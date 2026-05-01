@@ -186,69 +186,37 @@
       background: rgba(255,255,255,.12);
     }
     .hero-scroll-hint { display: none; }
-
-    .shell-topline, .hero-side, .quick-card, .trust-row, .app-footer-note, .users-section { display: none; }
+    .shell-topline, .hero-side, .quick-card, .trust-row, .app-footer-note { display: none; }
     .browse-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-      width: 100%;
-      padding: 20px 0 0;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      padding: 20px 24px 0;
     }
-    .browse-grid > * {
-      min-width: 0;
-      width: 100%;
-    }
-    .section-shell {
-      width: 100%;
-      padding: 34px 0;
-    }
+    .browse-grid > * { min-width: 0; grid-column: 1 / -1; }
+    .section-shell { padding: 34px 0; }
     .section-card {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 26px clamp(16px, 3vw, 28px);
-      border-radius: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 26px;
+      border-radius: 28px;
       background: var(--bg-card);
-      border-left: 0;
-      border-right: 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow-card);
       backdrop-filter: blur(14px);
     }
-    .section-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 26px;
-      flex-wrap: wrap;
-    }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
     .section-head p { color: var(--text-secondary); max-width: 700px; }
-    .listings-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-    }
+    .listings-header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
     .results-count { color: var(--text-muted); font-size: .9rem; }
     .app-footer-note {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 24px clamp(16px, 3vw, 28px) 48px;
+      max-width: 1200px;
+      margin: 0 auto 48px;
+      padding: 0 24px;
       color: var(--text-muted);
       text-align: center;
       font-size: .9rem;
     }
-
-    @media (max-width: 1024px) {
-      .users-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
     @media (max-width: 768px) {
       .hero-panel { padding: 88px 16px 28px; }
       .hero-title { font-size: clamp(2.5rem, 11vw, 3.8rem); }
@@ -258,52 +226,9 @@
       .search-submit { width: 100%; order: 3; }
       .hero-stats { gap: 16px; }
       .stat-divider { display: none; }
-      .users-grid { grid-template-columns: 1fr; }
-      .browse-grid { padding: 16px 0 0; }
-      .section-card { padding: 18px; border-radius: 0; }
-      .nav-actions {
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-      }
-      .nav-actions .lang-btn,
-      .nav-actions .theme-btn,
-      .nav-actions .auth-btn,
-      .nav-actions .cta-btn {
-        padding: 10px 12px;
-        font-size: .8rem;
-        min-height: 40px;
-      }
-      .nav-actions .cta-btn {
-        display: inline-flex;
-        white-space: nowrap;
-      }
-      .nav-label {
-        display: none;
-      }
-      .nav-icon {
-        display: none;
-      }
-      .logo-text {
-        display: none;
-      }
-      .logo-image {
-        display: block;
-      }
-      .logo {
-        gap: 0;
-      }
-      .auth-btn,
-      .cta-btn,
-      .theme-btn,
-      .lang-btn {
-        min-width: 40px;
-        justify-content: center;
-      }
-      .auth-btn,
-      .cta-btn {
-        gap: 0;
-      }
+      .browse-grid { padding: 16px 16px 0; }
+      .section-card { padding: 18px; border-radius: 22px; }
+      .nav-actions .cta-btn { display: inline-flex; padding: 8px 14px; font-size: .8rem; }
     }
   </style>
   <script>
@@ -321,18 +246,13 @@
   <nav class="navbar" id="navbar">
     <div class="nav-inner">
       <a href="#" class="logo" aria-label="GabaoIndex Home">
-        <img class="logo-image" src="/img/Logo-Index.webp" alt="GabaoIndex" />
+        <span class="logo-icon">🌿</span>
         <span class="logo-text">Gabao<strong>Index</strong></span>
       </a>
       <div class="nav-actions">
-        <button class="theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">🌙</button>
-        <button class="auth-btn" id="authBtn" aria-label="Login or register">
-          <span class="nav-icon">👤</span><span class="nav-label">Login / Register</span>
-        </button>
-        <button class="cta-btn" id="addListingBtn" aria-label="Ajouter un lieu">
-          <span class="nav-icon">📍</span><span class="nav-label">Ajouter un lieu</span>
-        </button>
-        <button class="lang-btn" id="langBtn" title="Switch language" aria-label="Switch language">🇫🇷 / 🇬🇧</button>
+        <button class="lang-btn" id="langBtn" title="Switch language">FR / EN</button>
+        <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+        <button class="cta-btn" id="addListingBtn">+ Ajouter un lieu</button>
       </div>
     </div>
   </nav>
@@ -398,6 +318,7 @@
         </div>
       </section>
 
+
       <section class="section-shell listings-section" id="listingsSection">
         <div class="section-card">
           <div class="listings-header">
@@ -444,7 +365,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-logo">
-        <img class="logo-image" src="/img/Logo-Index.webp" alt="GabaoIndex" />
+        <span class="logo-icon">🌿</span>
         <span class="logo-text">Gabao<strong>Index</strong></span>
         <p class="footer-tagline" data-fr="Le répertoire de référence au Gabon" data-en="Gabon's go-to directory">Le répertoire de référence au Gabon</p>
       </div>

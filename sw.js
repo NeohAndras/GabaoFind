@@ -1,5 +1,5 @@
 // sw.js
-const CACHE_NAME = 'gabaofind-v1';
+const CACHE_NAME = 'gabaoindex-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -7,9 +7,7 @@ const STATIC_ASSETS = [
   '/app.js',
   '/style.css',
   '/firebase-config.js',
-  '/manifest.json',
-  '/img/icon-192.png',
-  '/img/icon-512.png'
+  '/manifest.json'
 ];
 
 // Install: cache static assets
@@ -33,27 +31,46 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: network-first with cache fallback
+// Fetch: network-first for navigations and HTML, cache fallback for static assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  
+
   // Skip non-GET requests
   if (request.method !== 'GET') return;
-  
+
   // Skip Firebase/API calls (handled by SDK)
   if (request.url.includes('firestore.googleapis.com')) return;
-  
+
+  const isHtmlRequest =
+    request.mode === 'navigate' ||
+    request.destination === 'document' ||
+    request.headers.get('accept')?.includes('text/html');
+
+  if (isHtmlRequest) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
+    );
+    return;
+  }
+
   event.respondWith(
     fetch(request)
       .then(response => {
-        // Cache successful responses
         if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
         }
         return response;
       })
-      .catch(() => caches.match(request)) // Fallback to cache
+      .catch(() => caches.match(request))
   );
 });
 

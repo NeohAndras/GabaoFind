@@ -1,8 +1,9 @@
 // firebase-config.js
-import { initializeApp } from 'firebase/app';
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+import { getStorage } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCnev6qdlNhgm4_WKPL1n5erz_C15H7JaI",
@@ -18,18 +19,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 
-/* Enable offline persistence only in the browser.
-   Cloudflare Pages/Workers bundling may execute modules in a worker global scope,
-   where IndexedDB persistence triggers disallowed async/global operations. */
-if (typeof window !== 'undefined') {
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('⚠️ Multiple tabs open – persistence limited');
-    } else if (err.code === 'unimplemented') {
-      console.warn('⚠️ Browser doesn\'t support offline persistence');
-    }
-  });
-}
+// Lazy loading is handled at the component level with loading="lazy" on images.
 
 export { app };

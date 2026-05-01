@@ -1,43 +1,3 @@
-# GabaoIndex - GitHub Setup Guide
-
-## 📋 Prerequisites
-
-### 1. Install Git
-Git is currently installing. Once complete, verify with:
-```bash
-git --version
-```
-
-**Alternative Installation Methods:**
-- Download from: https://git-scm.com/download/win
-- Or use Chocolatey: `choco install git`
-- Or use Scoop: `scoop install git`
-
-### 2. Create GitHub Account
-If you don't have one: https://github.com/join
-
-### 3. Install GitHub Desktop (Optional)
-For GUI: https://desktop.github.com/
-
----
-
-## 🚀 Step-by-Step GitHub Setup
-
-### Step 1: Initialize Git Repository
-```bash
-cd C:\Users\beaud\Desktop\WebDev\Antigravity\gabonfind
-git init
-```
-
-### Step 2: Configure Git
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-```
-
-### Step 3: Create .gitignore File
-Create a `.gitignore` file in your project root with:
-```
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -50,7 +10,7 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Coverage
 coverage/
 
 # Logs
@@ -64,14 +24,14 @@ logs
 .env.test.local
 .env.production.local
 
-# Editor directories and files
+# Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS generated files
+# OS files
 .DS_Store
 .DS_Store?
 ._*
@@ -83,137 +43,3 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
-```
-
-### Step 4: Add Files to Git
-```bash
-git add .
-```
-
-### Step 5: Initial Commit
-```bash
-git commit -m "Initial commit: GabaoIndex Gabon directory website"
-```
-
-### Step 6: Create GitHub Repository
-
-#### Option A: Using GitHub Website
-1. Go to https://github.com/new
-2. Repository name: `gabonfind` or `gaboaindex`
-3. Description: `🌿 GabaoIndex - Complete Gabon business directory with 493+ listings`
-4. Make it **Public** or **Private**
-5. **DO NOT** initialize with README (we already have one)
-6. Click **"Create repository"**
-
-#### Option B: Using GitHub CLI (if installed)
-```bash
-gh repo create gabonfind --public --source=. --remote=origin --push
-```
-
-### Step 7: Connect Local Repository to GitHub
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/gabonfind.git
-```
-
-Replace `YOUR_USERNAME` with your actual GitHub username.
-
-### Step 8: Push to GitHub
-```bash
-git push -u origin main
-```
-
----
-
-## 🔧 Troubleshooting
-
-### "fatal: remote origin already exists"
-If you get this error, remove the existing remote:
-```bash
-git remote remove origin
-git remote add origin https://github.com/YOUR_USERNAME/gabonfind.git
-```
-
-### "fatal: The current branch main has no upstream branch"
-Push with upstream setup:
-```bash
-git push --set-upstream origin main
-```
-
-### Authentication Issues
-GitHub now requires personal access tokens instead of passwords:
-
-1. Go to https://github.com/settings/tokens
-2. Generate new token with `repo` permissions
-3. Use token as password when prompted
-
-Or use SSH:
-```bash
-# Generate SSH key
-ssh-keygen -t ed25519 -C "your.email@example.com"
-
-# Add to GitHub: https://github.com/settings/keys
-# Then use SSH URL:
-git remote set-url origin git@github.com:YOUR_USERNAME/gabonfind.git
-```
-
----
-
-## 📁 Project Structure to Push
-
-Your repository will contain:
-```
-gabonfind/
-├── README.md                 # Deployment guide
-├── NETLIFY_DEPLOYMENT_GUIDE.md
-├── index.html               # Main website
-├── admin.html              # Admin panel
-├── style.css               # Styles
-├── app.js                  # Main app logic
-├── data.json              # 493+ listings
-├── netlify.toml           # Netlify config
-├── _redirects             # URL redirects
-├── netlify/
-│   └── functions/         # Serverless functions
-│       ├── data.js
-│       └── geocode.js
-├── img/                   # Images
-└── package.json           # Dependencies
-```
-
----
-
-## 🚀 Deploy to Netlify
-
-Once pushed to GitHub:
-
-1. Go to https://netlify.com
-2. **"Add new site"** → **"Import an existing project"**
-3. Connect your GitHub repository
-4. Deploy settings will auto-detect
-5. **Deploy!**
-
-Your site will be live at: `https://gabonfind.netlify.app`
-
----
-
-## 🔄 Future Updates
-
-To push future changes:
-```bash
-git add .
-git commit -m "Your commit message"
-git push
-```
-
----
-
-## 📞 Need Help?
-
-- **Git Documentation**: https://git-scm.com/doc
-- **GitHub Guides**: https://guides.github.com/
-- **Netlify Docs**: https://docs.netlify.com/
-
----
-
-**Ready to share your GabaoIndex Gabon directory with the world! 🌿🇬🇦**</content>
-<parameter name="filePath">c:\Users\beaud\Desktop\WebDev\Antigravity\gabonfind\GITHUB_SETUP_GUIDE.md
