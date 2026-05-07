@@ -3,227 +3,316 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GabaoIndex — CMS Admin</title>
+  <title>GabaoIndex — Admin</title>
   <meta name="color-scheme" content="dark light" />
   <meta name="theme-color" content="#0f2d18" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <style>
     :root {
-      --surface: rgba(255,255,255,.05);
-      --surface-2: rgba(255,255,255,.08);
-      --surface-3: rgba(255,255,255,.12);
+      --bg: #08150d;
+      --bg-2: #0b1b10;
+      --panel: rgba(255,255,255,.055);
+      --panel-2: rgba(255,255,255,.08);
+      --line: rgba(255,255,255,.09);
+      --text: #eef5ee;
+      --muted: #9dbfa0;
+      --soft: #5f7d63;
+      --accent: #3da65a;
+      --accent-2: #f0bc2e;
+      --danger: #ef4444;
+      --radius: 18px;
+      --radius-lg: 24px;
+      --shadow: 0 18px 50px rgba(0,0,0,.32);
+      --font-head: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
+      margin: 0;
       font-family: var(--font-body);
       background:
-        radial-gradient(circle at top, rgba(61,166,90,.08), transparent 28%),
-        linear-gradient(180deg, #08150d 0%, #0a1a0f 100%);
-      color: var(--text-primary);
+        radial-gradient(circle at top left, rgba(61,166,90,.12), transparent 24%),
+        radial-gradient(circle at top right, rgba(240,188,46,.10), transparent 18%),
+        linear-gradient(180deg, #07120c 0%, #0b1b10 100%);
+      color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
     }
     a { color: inherit; text-decoration: none; }
     button, input, select, textarea { font: inherit; }
-    .admin-shell { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+    img { display: block; max-width: 100%; }
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .login-card {
+      width: min(440px, 100%);
+      padding: 30px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.95);
+      color: #102015;
+      box-shadow: 0 30px 90px rgba(0,0,0,.35);
+    }
+    .login-card h1 {
+      margin: 0 0 8px;
+      font-family: var(--font-head);
+      font-size: 2rem;
+      color: #1a4027;
+    }
+    .login-card p { margin: 0 0 18px; color: #50625a; }
+    .login-field {
+      width: 100%;
+      border: 1px solid #d7e2dc;
+      background: #fff;
+      color: #102015;
+      border-radius: 14px;
+      padding: 13px 14px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .login-field:focus { border-color: #3da65a; box-shadow: 0 0 0 3px rgba(61,166,90,.12); }
+
+    .shell {
+      display: none;
+      min-height: 100vh;
+    }
     .topbar {
-      position: sticky; top: 0; z-index: 40;
+      position: sticky;
+      top: 0;
+      z-index: 50;
       backdrop-filter: blur(18px);
-      background: rgba(8, 18, 10, .78);
-      border-bottom: 1px solid var(--border);
+      background: rgba(7,18,12,.82);
+      border-bottom: 1px solid var(--line);
     }
     .topbar-inner {
-      max-width: 1400px; margin: 0 auto;
-      padding: 16px 24px;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
     }
     .brand {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--font-head); font-size: 1.05rem; font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.05rem;
       white-space: nowrap;
     }
     .brand strong { color: var(--accent); }
-    .top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      min-height: 40px; padding: 0 14px;
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn, .mini-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-primary);
+      min-height: 42px;
+      padding: 0 16px;
       font-weight: 700;
-      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
     }
-    .pill:hover { transform: translateY(-1px); border-color: var(--brand); background: var(--bg-card-hov); }
-    .pill.primary {
-      background: linear-gradient(135deg, var(--green-500), var(--green-400));
-      color: #fff;
+    .btn:hover, .mini-btn:hover { transform: translateY(-1px); border-color: rgba(61,166,90,.35); }
+    .btn.primary, .mini-btn.primary {
+      background: linear-gradient(135deg, var(--accent), #49b968);
       border-color: transparent;
-      box-shadow: 0 6px 18px rgba(45,128,69,.22);
+      color: #fff;
     }
-    .pill.danger { background: rgba(220,38,38,.12); color: #fda4af; border-color: rgba(220,38,38,.2); }
+    .btn.danger, .mini-btn.danger {
+      background: rgba(239,68,68,.12);
+      color: #fecaca;
+      border-color: rgba(239,68,68,.2);
+    }
+
     .layout {
-      max-width: 1400px; width: 100%;
+      max-width: 1600px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 18px;
       display: grid;
-      grid-template-columns: 300px minmax(0,1fr);
-      gap: 24px;
+      grid-template-columns: 320px minmax(0,1fr);
+      gap: 18px;
       align-items: start;
     }
-    .sidebar, .workspace, .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-card);
-      backdrop-filter: blur(18px);
+    .sidebar, .panel, .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
     }
     .sidebar {
-      border-radius: 24px;
-      padding: 18px;
       position: sticky;
-      top: 92px;
+      top: 88px;
+      border-radius: 26px;
+      padding: 18px;
+      overflow: auto;
+      max-height: calc(100vh - 108px);
     }
     .sidebar h2 {
+      margin: 0 0 8px;
       font-family: var(--font-head);
-      font-size: 1.05rem;
-      margin-bottom: 6px;
+      font-size: 1.15rem;
     }
-    .sidebar p { color: var(--text-secondary); font-size: .92rem; margin-bottom: 18px; line-height: 1.5; }
-    .nav-list { display: grid; gap: 8px; }
+    .sidebar p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: .94rem;
+    }
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
     .nav-btn {
       width: 100%;
-      text-align: left;
-      padding: 12px 14px;
-      border-radius: 14px;
       border: 1px solid transparent;
       background: transparent;
-      color: var(--text-secondary);
+      color: var(--muted);
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: left;
       cursor: pointer;
-      transition: all var(--transition);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
     }
-    .nav-btn:hover { background: rgba(255,255,255,.04); color: var(--text-primary); }
-    .nav-btn.active {
-      background: linear-gradient(135deg, rgba(61,166,90,.16), rgba(45,128,69,.12));
-      color: var(--text-primary);
-      border-color: rgba(61,166,90,.25);
+    .nav-btn span { color: var(--soft); font-weight: 600; font-size: .8rem; }
+    .nav-btn.active, .nav-btn:hover {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border-color: var(--line);
     }
-    .nav-btn span { font-size: .82rem; color: var(--text-muted); }
+
     .workspace {
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(320px, .95fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+    .hero-copy {
+      padding: 26px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(240,188,46,.12), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(61,166,90,.12), transparent 28%),
+        var(--panel);
+      border: 1px solid var(--line);
+      min-width: 0;
+    }
+    .hero-copy h1 {
+      margin: 0 0 10px;
+      font-family: var(--font-head);
+      font-size: clamp(1.9rem, 3vw, 3rem);
+      line-height: 1.02;
+    }
+    .hero-copy p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 68ch;
+      line-height: 1.65;
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .chip {
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 600;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      min-width: 0;
+    }
+    .stat {
       border-radius: 24px;
       padding: 18px;
-      min-height: calc(100vh - 132px);
+      background: rgba(255,255,255,.045);
+      border: 1px solid var(--line);
+      min-width: 0;
     }
-    .hero-panel {
-      display: grid;
-      grid-template-columns: 1.4fr .9fr;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-    .hero-card {
-      border-radius: 22px;
-      padding: 20px;
-      background:
-        radial-gradient(circle at top right, rgba(240,188,46,.12), transparent 25%),
-        radial-gradient(circle at bottom left, rgba(61,166,90,.12), transparent 28%),
-        var(--surface);
-      border: 1px solid var(--border);
-    }
-    .hero-card h1 {
+    .stat .value {
       font-family: var(--font-head);
-      font-size: clamp(1.8rem, 3vw, 2.8rem);
-      line-height: 1.02;
-      margin-bottom: 10px;
-    }
-    .hero-card p { color: var(--text-secondary); max-width: 62ch; }
-    .status-row {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .status-chip {
-      display: inline-flex; align-items: center; gap: 8px;
-      min-height: 36px; padding: 0 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-      font-size: .88rem;
-    }
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 12px;
-    }
-    .metric {
-      border-radius: 20px;
-      padding: 16px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-    }
-    .metric .value {
-      font-family: var(--font-head);
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 800;
-      color: var(--accent);
+      color: var(--accent-2);
       line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-    .metric .label { color: var(--text-secondary); font-size: .85rem; }
-    .toolbar {
+    .stat .label { color: var(--muted); font-size: .86rem; }
+
+    .tabs {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      margin: 16px 0;
+      gap: 8px;
     }
-    .search-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      width: 100%;
-    }
-    .search-row input, .search-row select, .search-row textarea, .form-grid input, .form-grid select, .form-grid textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color: var(--text-primary);
-      border-radius: 14px;
-      padding: 12px 14px;
-      outline: none;
-    }
-    .search-row input:focus, .search-row select:focus, .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
-      border-color: var(--brand);
-      box-shadow: 0 0 0 3px rgba(61,166,90,.14);
-    }
-    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
     .tab {
-      padding: 10px 14px;
       border-radius: 999px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--line);
       background: rgba(255,255,255,.04);
-      color: var(--text-secondary);
+      color: var(--muted);
+      padding: 10px 14px;
       cursor: pointer;
       font-weight: 700;
     }
-    .tab.active { background: linear-gradient(135deg, var(--green-600), var(--green-500)); color: #fff; border-color: transparent; }
-    .panel { display: none; }
-    .panel.active { display: block; }
-    .card {
-      border-radius: 22px;
+    .tab.active {
+      background: linear-gradient(135deg, #236334, #3da65a);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .panel {
+      display: none;
+      border-radius: 28px;
       overflow: hidden;
-      margin-bottom: 16px;
+    }
+    .panel.active { display: block; }
+
+    .card {
+      border-radius: 28px;
+      overflow: hidden;
     }
     .card-header {
       padding: 18px 20px;
-      border-bottom: 1px solid var(--border);
       background: rgba(255,255,255,.03);
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -231,121 +320,163 @@
       flex-wrap: wrap;
     }
     .card-header h3 {
+      margin: 0;
       font-family: var(--font-head);
       font-size: 1.1rem;
     }
     .card-body { padding: 20px; }
+
     .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
-    .preview {
-      min-height: 120px;
-      border-radius: 18px;
-      border: 1px dashed var(--border);
-      background: rgba(255,255,255,.03);
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+
+    .helper { color: var(--muted); line-height: 1.55; font-size: .94rem; }
+    .toolbar {
       display: grid;
-      place-items: center;
-      color: var(--text-muted);
-      overflow: hidden;
-      padding: 14px;
-      text-align: center;
+      gap: 12px;
+      margin: 12px 0 16px;
     }
-    .preview img {
-      max-width: 100%;
-      max-height: 180px;
-      object-fit: contain;
-      display: block;
-      border-radius: 12px;
+    .search-row {
+      display: grid;
+      grid-template-columns: minmax(0,1.4fr) repeat(3, minmax(0,.8fr));
+      gap: 10px;
     }
-    .table-wrap { overflow: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    .bulk-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(61,166,90,.45);
+      box-shadow: 0 0 0 3px rgba(61,166,90,.14);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border-radius: 18px;
+      background: rgba(255,255,255,.02);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px;
+    }
     th, td {
       padding: 14px 12px;
       border-bottom: 1px solid rgba(255,255,255,.08);
-      vertical-align: top;
       text-align: left;
+      vertical-align: top;
       font-size: .92rem;
     }
-    th { color: var(--text-secondary); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
-    td small { color: var(--text-muted); }
+    th {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .78rem;
+    }
+    td small { color: var(--soft); }
     .row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .mini-btn {
-      min-height: 34px;
-      padding: 0 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.05);
-      color: var(--text-primary);
-      cursor: pointer;
-      font-size: .84rem;
-      font-weight: 700;
-    }
-    .mini-btn:hover { border-color: var(--brand); }
-    .mini-btn.primary { background: linear-gradient(135deg, var(--green-500), var(--green-400)); color: #fff; border-color: transparent; }
-    .mini-btn.danger { background: rgba(220,38,38,.12); color: #fca5a5; border-color: rgba(220,38,38,.2); }
-    .list-stack { display: grid; gap: 10px; }
-    .item {
-      padding: 14px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
+
+    .preview {
+      min-height: 120px;
+      border-radius: 18px;
+      border: 1px dashed var(--line);
       background: rgba(255,255,255,.03);
-    }
-    .item-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
-    .muted { color: var(--text-muted); }
-    .helper { color: var(--text-secondary); font-size: .9rem; line-height: 1.6; }
-    .form-grid { display: grid; gap: 12px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    textarea { min-height: 110px; resize: vertical; }
-    .footer-note {
-      margin-top: 16px;
-      color: var(--text-muted);
-      font-size: .88rem;
-    }
-    .login-screen {
-      min-height: 100vh;
       display: grid;
       place-items: center;
+      padding: 14px;
+      color: var(--soft);
+      text-align: center;
+      overflow: hidden;
+    }
+    .preview img {
+      max-height: 180px;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+
+    .list-stack { display: grid; gap: 10px; }
+    .sortable-item {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 100;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(8px);
+      padding: 18px;
+    }
+    .modal.active { display: grid; }
+    .modal-content {
+      width: min(920px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 28px;
       padding: 24px;
-      background:
-        radial-gradient(circle at top, rgba(61,166,90,.12), transparent 30%),
-        linear-gradient(135deg, #1a4027 0%, #0a1a0f 100%);
+      background: #0f2d18;
+      border: 1px solid var(--line);
+      box-shadow: 0 35px 100px rgba(0,0,0,.55);
+      position: relative;
     }
-    .login-card {
-      width: min(460px, 100%);
-      border-radius: 24px;
-      padding: 30px;
-      background: rgba(255,255,255,.96);
-      color: #102015;
-      box-shadow: 0 24px 80px rgba(0,0,0,.25);
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 1.1rem;
     }
-    .login-card h1 {
-      font-family: var(--font-head);
-      font-size: 2rem;
-      margin-bottom: 8px;
-      color: #1a4027;
-    }
-    .login-card p { color: #52625b; margin-bottom: 20px; }
-    .login-card input {
-      width: 100%;
-      padding: 13px 14px;
-      border-radius: 14px;
-      border: 1px solid #d7e2dc;
-      margin-bottom: 12px;
-      outline: none;
-    }
-    .login-card input:focus { border-color: #3da65a; box-shadow: 0 0 0 3px rgba(61,166,90,.12); }
+
+    .form-grid { display: grid; gap: 12px; margin-top: 12px; }
+    .full { grid-column: 1 / -1; }
+    .footer-note { margin-top: 10px; color: var(--soft); font-size: .88rem; line-height: 1.5; }
     .login-error { min-height: 22px; color: #dc2626; margin-top: 8px; font-size: .92rem; }
-    @media (max-width: 1100px) {
+
+    @media (max-width: 1200px) {
       .layout { grid-template-columns: 1fr; }
-      .sidebar { position: static; }
-      .hero-panel, .metrics, .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+      .sidebar { position: static; max-height: none; }
+      .hero { grid-template-columns: 1fr; }
+      .stats, .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 760px) {
-      .topbar-inner, .layout { padding-left: 16px; padding-right: 16px; }
-      .hero-panel, .metrics, .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      .workspace { padding: 14px; }
-      .sidebar { padding: 16px; border-radius: 20px; }
+    @media (max-width: 820px) {
+      .topbar-inner, .layout { padding-left: 14px; padding-right: 14px; }
+      .hero, .stats, .grid-2, .grid-3, .grid-4, .search-row { grid-template-columns: 1fr; }
       .card-body { padding: 16px; }
+      .hero-copy { padding: 20px; }
+      .sidebar { padding: 14px; }
+      .table-wrap { margin-left: -2px; margin-right: -2px; }
+      table { min-width: 760px; }
       .top-actions { width: 100%; justify-content: flex-end; }
     }
   </style>
@@ -356,79 +487,81 @@
       <h1>GabaoIndex CMS</h1>
       <p>Connectez-vous pour gérer le site en direct.</p>
       <form id="loginForm">
-        <input type="email" id="adminEmail" placeholder="admin@gabaoindex.com" autocomplete="username" />
-        <input type="password" id="adminPassword" placeholder="Mot de passe" autocomplete="current-password" />
-        <button class="pill primary" style="width:100%; justify-content:center;" type="submit">Se connecter</button>
+        <input class="login-field" type="email" id="adminEmail" placeholder="admin@gabaoindex.com" autocomplete="username" />
+        <input class="login-field" type="password" id="adminPassword" placeholder="Mot de passe" autocomplete="current-password" />
+        <button class="btn primary" style="width:100%;" type="submit">Se connecter</button>
         <div class="login-error" id="loginError"></div>
         <div class="login-error" id="adminStatus" style="color:#475569;"></div>
       </form>
     </div>
   </div>
 
-  <div id="adminApp" class="admin-shell" style="display:none;">
+  <div id="adminApp" class="shell">
     <header class="topbar">
       <div class="topbar-inner">
-        <div class="brand">🌿 Gabao<strong>Index</strong> <span style="color:var(--text-secondary); font-weight:700;">CMS</span></div>
+        <div class="brand">🌿 Gabao<strong>Index</strong> <span style="color:var(--muted); font-weight:700;">CMS</span></div>
         <div class="top-actions">
-          <a class="pill" href="/index.html">Voir le site</a>
-          <button class="pill" id="saveAllBtn">Sauvegarder tout</button>
-          <button class="pill danger" id="logoutBtn">Déconnexion</button>
+          <a class="btn" href="/index.html">Voir le site</a>
+          <button class="btn primary" id="saveAllBtn" type="button">Sauvegarder tout</button>
+          <button class="btn danger" id="logoutBtn" type="button">Déconnexion</button>
         </div>
       </div>
     </header>
 
     <main class="layout">
       <aside class="sidebar">
-        <h2>Tableau de bord</h2>
-        <p>Modifiez listings, catégories, héros, marque et médias avec sauvegarde directe dans le contenu live.</p>
-        <div class="nav-list" id="navList">
+        <h2>Dashboard</h2>
+        <p>Interface de gestion refaite à zéro, pensée pour les grands écrans, les changements rapides et la clarté visuelle.</p>
+        <div class="nav" id="navList">
           <button class="nav-btn active" data-panel="overview">Vue d’ensemble <span>stats</span></button>
           <button class="nav-btn" data-panel="listings">Listings <span>CRUD</span></button>
-          <button class="nav-btn" data-panel="hero">Hero slides <span>bannière</span></button>
-          <button class="nav-btn" data-panel="categories">Catégories <span>taxonomie</span></button>
-          <button class="nav-btn" data-panel="brand">Brand <span>logo/texte</span></button>
           <button class="nav-btn" data-panel="media">Médias <span>upload</span></button>
           <button class="nav-btn" data-panel="sorting">Tri <span>ordre</span></button>
-          <button class="nav-btn" data-panel="tools">Outils <span>validation</span></button>
-          <button class="nav-btn" data-panel="settings">Paramètres <span>sauvegarde</span></button>
+          <button class="nav-btn" data-panel="categories">Catégories <span>taxonomie</span></button>
+          <button class="nav-btn" data-panel="hero">Hero slides <span>bannière</span></button>
+          <button class="nav-btn" data-panel="brand">Brand <span>logo</span></button>
+          <button class="nav-btn" data-panel="xml">XML bulk <span>import</span></button>
+          <button class="nav-btn" data-panel="tools">Outils <span>check</span></button>
+          <button class="nav-btn" data-panel="settings">Paramètres <span>backup</span></button>
         </div>
       </aside>
 
       <section class="workspace">
-        <section class="hero-panel">
-          <div class="hero-card">
-            <h1>Interface CMS complète pour le site live</h1>
+        <section class="hero">
+          <div class="hero-copy">
+            <h1>Admin dashboard, version browser-first</h1>
             <p>
-              Gérez les contenus principaux du répertoire en temps réel : fiches, images, logo, marque, slides, catégories, ordre d’affichage et outils de contrôle.
+              Une nouvelle base visuelle, sans reprendre l’ancien style. L’interface privilégie la lisibilité,
+              l’espace, les colonnes nettes et les actions rapides pour gérer listings, médias, tri et imports.
             </p>
-            <div class="status-row">
-              <div class="status-chip">✓ Sauvegarde directe sur Firebase</div>
-              <div class="status-chip">✓ Cache local + fallback</div>
-              <div class="status-chip">✓ Mise à jour du site en direct</div>
+            <div class="chip-row">
+              <div class="chip">Desktop-first layout</div>
+              <div class="chip">Fast actions</div>
+              <div class="chip">Mobile responsive</div>
+              <div class="chip">Firebase + storage</div>
             </div>
           </div>
-          <div class="metrics" id="metricsGrid"></div>
+          <div class="stats" id="metricsGrid"></div>
         </section>
 
         <div class="tabs" id="tabs">
           <button class="tab active" data-panel="overview">Vue d’ensemble</button>
           <button class="tab" data-panel="listings">Listings</button>
-          <button class="tab" data-panel="hero">Hero</button>
-          <button class="tab" data-panel="categories">Catégories</button>
-          <button class="tab" data-panel="brand">Brand</button>
           <button class="tab" data-panel="media">Médias</button>
           <button class="tab" data-panel="sorting">Tri</button>
+          <button class="tab" data-panel="categories">Catégories</button>
+          <button class="tab" data-panel="hero">Hero</button>
+          <button class="tab" data-panel="brand">Brand</button>
+          <button class="tab" data-panel="xml">XML bulk</button>
           <button class="tab" data-panel="tools">Outils</button>
           <button class="tab" data-panel="settings">Paramètres</button>
         </div>
 
-        <div id="overview" class="panel active">
+        <section id="overview" class="panel active">
           <div class="card">
             <div class="card-header">
-              <h3>Statistiques rapides</h3>
-              <div class="row-actions">
-                <button class="mini-btn primary" id="refreshBtn">Rafraîchir</button>
-              </div>
+              <h3>Résumé rapide</h3>
+              <button class="mini-btn primary" id="refreshBtn" type="button">Rafraîchir</button>
             </div>
             <div class="card-body">
               <div class="grid-4" id="overviewMetrics"></div>
@@ -448,127 +581,50 @@
               </table>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div id="listings" class="panel">
+        <section id="listings" class="panel">
           <div class="card">
             <div class="card-header">
               <h3>Listings</h3>
-              <div class="row-actions">
-                <button class="mini-btn primary" onclick="openModal('listingModal')">+ Nouveau listing</button>
-              </div>
+              <button class="mini-btn primary" id="newListingBtn" type="button">+ Nouveau listing</button>
             </div>
             <div class="card-body">
               <div class="toolbar">
                 <div class="search-row">
-                  <input type="text" id="searchInput" placeholder="Rechercher un listing..." oninput="filterListings()" />
-                  <select id="filterCat" onchange="filterListings()"><option value="">Toutes les catégories</option></select>
-                  <select id="filterCity" onchange="filterListings()"><option value="">Toutes les villes</option></select>
+                  <input id="searchInput" type="text" placeholder="Rechercher un listing..." />
+                  <select id="filterCat"><option value="">Toutes les catégories</option></select>
+                  <select id="filterCity"><option value="">Toutes les villes</option></select>
+                  <select id="filterSort">
+                    <option value="order">Tri: ordre</option>
+                    <option value="category">Tri: catégorie</option>
+                    <option value="name">Tri: nom</option>
+                    <option value="city">Tri: ville</option>
+                    <option value="featured">Tri: featured</option>
+                  </select>
+                </div>
+                <div class="bulk-row">
+                  <button class="mini-btn" id="clearFiltersBtn" type="button">Réinitialiser</button>
+                  <button class="mini-btn" id="openXmlBtn" type="button">Importer XML</button>
                 </div>
               </div>
               <div class="table-wrap">
                 <table>
                   <thead>
-                    <tr><th>Nom</th><th>Catégorie</th><th>Ville</th><th>Visibilité</th><th>Actions</th></tr>
+                    <tr><th>Nom</th><th>Catégorie</th><th>Ville</th><th>Ordre</th><th>Visibilité</th><th>Actions</th></tr>
                   </thead>
                   <tbody id="listingsTable"></tbody>
                 </table>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div id="hero" class="panel">
+        <section id="media" class="panel">
           <div class="card">
             <div class="card-header">
-              <h3>Hero slides</h3>
-              <div class="row-actions">
-                <button class="mini-btn primary" onclick="openModal('heroModal')">+ Ajouter slide</button>
-              </div>
-            </div>
-            <div class="card-body">
-              <p class="helper">Les slides sont affichés dans le hero de la page d’accueil. Utilisez des images fortes et un texte court.</p>
-              <div class="table-wrap" style="margin-top:14px;">
-                <table>
-                  <thead><tr><th>FR</th><th>EN</th><th>Image</th><th>Actions</th></tr></thead>
-                  <tbody id="heroTable"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="categories" class="panel">
-          <div class="card">
-            <div class="card-header">
-              <h3>Catégories</h3>
-              <div class="row-actions">
-                <button class="mini-btn primary" onclick="openModal('catModal')">+ Ajouter catégorie</button>
-              </div>
-            </div>
-            <div class="card-body">
-              <p class="helper">La taxonomie impacte le filtrage du site public. Gardez des catégories courtes et visuelles.</p>
-              <div class="table-wrap" style="margin-top:14px;">
-                <table>
-                  <thead><tr><th>ID</th><th>Nom FR</th><th>Nom EN</th><th>Icône</th><th>Actions</th></tr></thead>
-                  <tbody id="catTable"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="brand" class="panel">
-          <div class="card">
-            <div class="card-header">
-              <h3>Brand / identité visuelle</h3>
-              <div class="row-actions">
-                <button class="mini-btn primary" type="button" onclick="saveBrandLayout()">Sauvegarder l’identité</button>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="grid-2">
-                <div class="form-grid">
-                  <label>Logo principal
-                    <input id="brandLogoUrl" type="url" placeholder="URL du logo" />
-                  </label>
-                  <div class="preview" id="brandLogoPreview">Aperçu du logo</div>
-                  <div class="row-actions">
-                    <input id="brandLogoFile" type="file" accept="image/*" class="full" />
-                  </div>
-                  <div class="row-actions">
-                    <button class="mini-btn" type="button" onclick="uploadBrandLogo('firebase')">Uploader via Firebase</button>
-                    <button class="mini-btn" type="button" onclick="uploadBrandLogo('cloudinary')">Uploader via Cloudinary</button>
-                  </div>
-                  <div class="footer-note">Le logo est utilisé dans la navbar et le footer du site public.</div>
-                </div>
-                <div class="form-grid">
-                  <label>Texte du logo
-                    <input id="brandLogoAlt" type="text" placeholder="GabaoIndex" />
-                  </label>
-                  <label>Icône du logo
-                    <input id="brandIcon" type="text" placeholder="🌿" />
-                  </label>
-                  <label>Baseline FR
-                    <input id="brandTaglineFr" type="text" placeholder="Le répertoire de référence au Gabon" />
-                  </label>
-                  <label>Baseline EN
-                    <input id="brandTaglineEn" type="text" placeholder="Gabon's go-to directory" />
-                  </label>
-                  <div class="preview-chip">Aperçu: <span id="brandPreviewText">🌿 Gabao<strong>Index</strong></span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="media" class="panel">
-          <div class="card">
-            <div class="card-header">
-              <h3>Médias des établissements</h3>
-              <div class="row-actions">
-                <button class="mini-btn primary" type="button" onclick="applyMediaToListing()">Appliquer au listing</button>
-              </div>
+              <h3>Médias</h3>
+              <button class="mini-btn primary" id="applyMediaBtn" type="button">Appliquer au listing</button>
             </div>
             <div class="card-body">
               <div class="grid-2">
@@ -586,8 +642,8 @@
                     <input id="cloudinaryCloudName" type="text" placeholder="votre-cloud-name" />
                   </label>
                   <div class="row-actions">
-                    <button class="mini-btn" type="button" onclick="uploadEstablishmentMedia('firebase')">Uploader via Firebase</button>
-                    <button class="mini-btn" type="button" onclick="uploadEstablishmentMedia('cloudinary')">Uploader via Cloudinary</button>
+                    <button class="mini-btn" id="uploadFirebaseBtn" type="button">Uploader via Firebase</button>
+                    <button class="mini-btn" id="uploadCloudinaryBtn" type="button">Uploader via Cloudinary</button>
                   </div>
                 </div>
                 <div class="form-grid">
@@ -602,107 +658,243 @@
                       <option value="logo">Logo</option>
                     </select>
                   </label>
-                  <div class="footer-note">Le média peut être affecté à un listing existant et apparaître immédiatement côté public.</div>
+                  <div class="footer-note">
+                    Le média peut être chargé dans Firebase Storage ou lié via URL, puis enregistré dans le listing.
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div id="sorting" class="panel">
+        <section id="sorting" class="panel">
           <div class="card">
             <div class="card-header">
               <h3>Tri et hiérarchie</h3>
+              <button class="mini-btn primary" id="saveSortBtn" type="button">Sauvegarder l’ordre</button>
+            </div>
+            <div class="card-body">
+              <p class="helper">Classez les listings par ordre, catégorie, ville ou nom et filtrez rapidement les résultats.</p>
+              <div class="toolbar">
+                <div class="search-row">
+                  <select id="sortCategory"><option value="">Toutes les catégories</option></select>
+                  <select id="sortMode">
+                    <option value="order">Ordre croissant</option>
+                    <option value="category">Catégorie</option>
+                    <option value="name">Nom</option>
+                    <option value="city">Ville</option>
+                  </select>
+                  <select id="sortDirection">
+                    <option value="asc">Ascendant</option>
+                    <option value="desc">Descendant</option>
+                  </select>
+                  <input id="sortSearch" type="text" placeholder="Filtrer dans le tri..." />
+                </div>
+              </div>
+              <div id="sortableList" class="list-stack"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="categories" class="panel">
+          <div class="card">
+            <div class="card-header">
+              <h3>Catégories</h3>
+              <button class="mini-btn primary" id="newCatBtn" type="button">+ Ajouter catégorie</button>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>ID</th><th>Nom FR</th><th>Nom EN</th><th>Icône</th><th>Actions</th></tr></thead>
+                  <tbody id="catTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="hero" class="panel">
+          <div class="card">
+            <div class="card-header">
+              <h3>Hero slides</h3>
+              <button class="mini-btn primary" id="newHeroBtn" type="button">+ Ajouter slide</button>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>FR</th><th>EN</th><th>Image</th><th>Actions</th></tr></thead>
+                  <tbody id="heroTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="brand" class="panel">
+          <div class="card">
+            <div class="card-header">
+              <h3>Brand / identité</h3>
+              <button class="mini-btn primary" id="saveBrandBtn" type="button">Sauvegarder l’identité</button>
+            </div>
+            <div class="card-body">
+              <div class="grid-2">
+                <div class="form-grid">
+                  <label>Logo principal
+                    <input id="brandLogoUrl" type="url" placeholder="URL du logo" />
+                  </label>
+                  <div class="preview" id="brandLogoPreview">Aperçu du logo</div>
+                  <label>Fichier logo
+                    <input id="brandLogoFile" type="file" accept="image/*" />
+                  </label>
+                  <div class="row-actions">
+                    <button class="mini-btn" id="uploadBrandFirebaseBtn" type="button">Uploader via Firebase</button>
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <label>Texte du logo
+                    <input id="brandLogoAlt" type="text" placeholder="GabaoIndex" />
+                  </label>
+                  <label>Icône du logo
+                    <input id="brandIcon" type="text" placeholder="🌿" />
+                  </label>
+                  <label>Baseline FR
+                    <input id="brandTaglineFr" type="text" placeholder="Le répertoire de référence au Gabon" />
+                  </label>
+                  <label>Baseline EN
+                    <input id="brandTaglineEn" type="text" placeholder="Gabon's go-to directory" />
+                  </label>
+                  <div class="preview" style="min-height:72px" id="brandPreviewText">🌿 Gabao<strong>Index</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="xml" class="panel">
+          <div class="card">
+            <div class="card-header">
+              <h3>Import XML en lot</h3>
               <div class="row-actions">
-                <button class="mini-btn primary" onclick="saveSortOrder()">Sauvegarder l’ordre</button>
+                <button class="mini-btn primary" id="importXmlBtn" type="button">Importer le fichier</button>
+                <button class="mini-btn" id="downloadXmlExampleBtn" type="button">Exemple XML</button>
               </div>
             </div>
             <div class="card-body">
-              <p class="helper">Cette section vous permet de visualiser les listings dans leur ordre actuel et de préparer un tri éditorial cohérent.</p>
-              <div id="sortableList" class="list-stack" style="margin-top:14px;"></div>
+              <p class="helper">Chargez un fichier XML contenant plusieurs listings. Un exemple est aussi disponible à la racine du projet.</p>
+              <div class="grid-2" style="margin-top:14px;">
+                <div class="form-grid">
+                  <label>Fichier XML
+                    <input id="xmlFileInput" type="file" accept=".xml,text/xml,application/xml" />
+                  </label>
+                  <label>Catégorie par défaut
+                    <select id="xmlDefaultCategory"></select>
+                  </label>
+                </div>
+                <div class="form-grid">
+                  <label>Aperçu XML</label>
+                  <div class="preview" id="xmlPreview">Aucun XML chargé</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div id="tools" class="panel">
+        <section id="tools" class="panel">
           <div class="card">
             <div class="card-header">
               <h3>Outils de contrôle</h3>
             </div>
             <div class="card-body">
               <div class="grid-2">
-                <div class="item">
-                  <div class="item-head"><strong>Validation</strong></div>
-                  <p class="helper">Vérifie la présence des données indispensables et signale les zones à corriger.</p>
-                  <div style="margin-top:12px;">
-                    <button class="mini-btn primary" onclick="validateData()">Vérifier les données</button>
-                    <div id="validationRes" style="margin-top:12px;"></div>
+                <div class="card" style="margin:0;">
+                  <div class="card-body">
+                    <div class="item-head"><strong>Validation</strong></div>
+                    <p class="helper">Vérifie la présence des données indispensables et signale les points à corriger.</p>
+                    <div style="margin-top:12px;">
+                      <button class="mini-btn primary" id="validateBtn" type="button">Vérifier les données</button>
+                      <div id="validationRes" style="margin-top:12px;"></div>
+                    </div>
                   </div>
                 </div>
-                <div class="item">
-                  <div class="item-head"><strong>Géocodage</strong></div>
-                  <p class="helper">Préparez l’enrichissement des fiches sans casser la structure du contenu.</p>
-                  <div style="margin-top:12px;">
-                    <button class="mini-btn primary" onclick="bulkGeocode('missing')">Géocoder les manquants</button>
-                    <div id="geocodeProgress" style="margin-top:12px;"></div>
+                <div class="card" style="margin:0;">
+                  <div class="card-body">
+                    <div class="item-head"><strong>Géocodage</strong></div>
+                    <p class="helper">Préparez l’enrichissement des fiches sans casser la structure du contenu.</p>
+                    <div style="margin-top:12px;">
+                      <button class="mini-btn primary" id="geocodeBtn" type="button">Géocoder les manquants</button>
+                      <div id="geocodeProgress" style="margin-top:12px;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div id="settings" class="panel">
+        <section id="settings" class="panel">
           <div class="card">
             <div class="card-header">
               <h3>Sauvegarde et restauration</h3>
             </div>
             <div class="card-body">
               <div class="grid-2">
-                <div class="item">
-                  <div class="item-head"><strong>Backup</strong></div>
-                  <p class="helper">Créez une sauvegarde JSON locale de l’ensemble du contenu actuel.</p>
-                  <div class="row-actions" style="margin-top:12px;">
-                    <button class="mini-btn primary" onclick="createBackup()">Créer backup</button>
+                <div class="card" style="margin:0;">
+                  <div class="card-body">
+                    <div class="item-head"><strong>Backup</strong></div>
+                    <p class="helper">Créez une sauvegarde JSON locale de l’ensemble du contenu actuel.</p>
+                    <div class="row-actions" style="margin-top:12px;">
+                      <button class="mini-btn primary" id="backupBtn" type="button">Créer backup</button>
+                    </div>
                   </div>
                 </div>
-                <div class="item">
-                  <div class="item-head"><strong>Restauration</strong></div>
-                  <p class="helper">Importez un backup JSON pour restaurer tout le CMS.</p>
-                  <div class="row-actions" style="margin-top:12px;">
-                    <button class="mini-btn" onclick="restoreBackup()">Restaurer</button>
-                    <input type="file" id="restoreFile" accept=".json" style="display:none;" />
+                <div class="card" style="margin:0;">
+                  <div class="card-body">
+                    <div class="item-head"><strong>Restauration</strong></div>
+                    <p class="helper">Importez un backup JSON pour restaurer tout le CMS.</p>
+                    <div class="row-actions" style="margin-top:12px;">
+                      <button class="mini-btn" id="restoreBtn" type="button">Restaurer</button>
+                      <input type="file" id="restoreFile" accept=".json" style="display:none;" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
+        </section>
       </section>
     </main>
   </div>
 
   <div id="listingModal" class="modal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('listingModal')">×</button>
-      <h2 style="font-family:var(--font-head); margin-bottom:14px;">Ajouter / Éditer un listing</h2>
-      <form id="listingForm" onsubmit="saveListing(event)" class="form-grid">
+      <button class="modal-close" id="closeListingModalBtn" type="button">×</button>
+      <h2 style="font-family:var(--font-head); margin:0;">Ajouter / Éditer un listing</h2>
+      <form id="listingForm" class="form-grid">
         <input id="listName" placeholder="Nom *" required class="full" />
-        <select id="listCat" required></select>
-        <select id="listCity" required></select>
-        <input id="listPhone" placeholder="Téléphone" />
+        <div class="grid-2 full">
+          <select id="listCat" required></select>
+          <select id="listCity" required></select>
+        </div>
+        <div class="grid-2 full">
+          <input id="listPhone" placeholder="Téléphone" />
+          <input id="listOrder" type="number" placeholder="Ordre" />
+        </div>
         <input id="listAddr" placeholder="Adresse *" required class="full" />
         <textarea id="listDesc" placeholder="Description" class="full"></textarea>
-        <input id="listLat" type="number" step="0.0001" placeholder="Latitude" />
-        <input id="listLng" type="number" step="0.0001" placeholder="Longitude" />
-        <input id="listOrder" type="number" placeholder="Ordre" />
-        <label class="full" style="display:flex; align-items:center; gap:10px;">
-          <input type="checkbox" id="listFeat" style="width:auto;" /> Featured
+        <div class="grid-2 full">
+          <input id="listLat" type="number" step="0.0001" placeholder="Latitude" />
+          <input id="listLng" type="number" step="0.0001" placeholder="Longitude" />
+        </div>
+        <div class="grid-2 full">
+          <input id="listImageUrl" type="url" placeholder="Image URL" />
+          <input id="listImageFile" type="file" accept="image/*" />
+        </div>
+        <label class="full" style="display:flex;align-items:center;gap:10px;">
+          <input id="listFeat" type="checkbox" style="width:auto;" /> Featured
         </label>
         <div class="row-actions full">
           <button class="mini-btn primary" type="submit">Sauvegarder</button>
-          <button class="mini-btn" type="button" onclick="closeModal('listingModal')">Annuler</button>
+          <button class="mini-btn" id="cancelListingBtn" type="button">Annuler</button>
         </div>
       </form>
     </div>
@@ -710,15 +902,15 @@
 
   <div id="heroModal" class="modal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('heroModal')">×</button>
-      <h2 style="font-family:var(--font-head); margin-bottom:14px;">Ajouter un slide</h2>
-      <form onsubmit="saveHero(event)" class="form-grid">
+      <button class="modal-close" id="closeHeroModalBtn" type="button">×</button>
+      <h2 style="font-family:var(--font-head); margin:0;">Ajouter un slide</h2>
+      <form id="heroForm" class="form-grid">
         <input id="heroUrl" type="url" placeholder="URL image *" required class="full" />
         <input id="heroFR" placeholder="Texte FR *" required />
         <input id="heroEN" placeholder="Texte EN *" required />
         <div class="row-actions full">
           <button class="mini-btn primary" type="submit">Sauvegarder</button>
-          <button class="mini-btn" type="button" onclick="closeModal('heroModal')">Annuler</button>
+          <button class="mini-btn" id="cancelHeroBtn" type="button">Annuler</button>
         </div>
       </form>
     </div>
@@ -726,16 +918,16 @@
 
   <div id="catModal" class="modal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('catModal')">×</button>
-      <h2 style="font-family:var(--font-head); margin-bottom:14px;">Ajouter une catégorie</h2>
-      <form onsubmit="saveCat(event)" class="form-grid">
+      <button class="modal-close" id="closeCatModalBtn" type="button">×</button>
+      <h2 style="font-family:var(--font-head); margin:0;">Ajouter une catégorie</h2>
+      <form id="catForm" class="form-grid">
         <input id="catId" placeholder="ID *" required />
         <input id="catFR" placeholder="Nom FR *" required />
         <input id="catEN" placeholder="Nom EN *" required />
         <input id="catIcon" placeholder="Icône *" required />
         <div class="row-actions full">
           <button class="mini-btn primary" type="submit">Sauvegarder</button>
-          <button class="mini-btn" type="button" onclick="closeModal('catModal')">Annuler</button>
+          <button class="mini-btn" id="cancelCatBtn" type="button">Annuler</button>
         </div>
       </form>
     </div>
@@ -757,66 +949,63 @@
     const adminStatus = document.getElementById('adminStatus');
 
     const ADMIN_EMAIL = 'admin@gabaoindex.com';
-
     let data = { listings: [], categories: [], hero_slides: [], brand: {}, media: {} };
-    let editing = null;
+    let editingListingId = null;
+    let editingCategoryId = null;
+    let xmlPayload = '';
 
-    function switchPanel(panel) {
+    const ids = [
+      'searchInput','filterCat','filterCity','filterSort','clearFiltersBtn','newListingBtn','openXmlBtn',
+      'sortCategory','sortMode','sortDirection','sortSearch','saveSortBtn','newCatBtn','newHeroBtn',
+      'saveBrandBtn','brandLogoUrl','brandLogoAlt','brandIcon','brandTaglineFr','brandTaglineEn',
+      'brandLogoPreview','brandPreviewText','brandLogoFile','uploadBrandFirebaseBtn',
+      'establishmentMediaFile','establishmentMediaUrl','cloudinaryUploadPreset','cloudinaryCloudName',
+      'establishmentMediaPreview','mediaTargetListing','mediaTargetType','uploadFirebaseBtn','uploadCloudinaryBtn',
+      'applyMediaBtn','catTable','heroTable','listingsTable','sortableList','validationRes','geocodeProgress',
+      'restoreBtn','restoreFile','backupBtn','validateBtn','geocodeBtn','listingModal','heroModal','catModal',
+      'listingForm','heroForm','catForm','listName','listCat','listCity','listPhone','listAddr','listDesc','listLat',
+      'listLng','listOrder','listFeat','listImageUrl','listImageFile','heroUrl','heroFR','heroEN','catId','catFR','catEN',
+      'catIcon','xmlFileInput','xmlPreview','xmlDefaultCategory','importXmlBtn','downloadXmlExampleBtn','closeListingModalBtn',
+      'closeHeroModalBtn','closeCatModalBtn','cancelListingBtn','cancelHeroBtn','cancelCatBtn','metricsGrid','overviewMetrics'
+    ];
+    const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+
+    function showPanel(panel) {
       document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
       document.getElementById(panel).classList.add('active');
       document.querySelectorAll('.tab, .nav-btn').forEach((b) => b.classList.remove('active'));
-      document.querySelectorAll(`[data-panel="${panel}"]`).forEach((el) => el.classList.add('active'));
+      document.querySelectorAll(`[data-panel="${panel}"]`).forEach((btn) => btn.classList.add('active'));
     }
 
     document.getElementById('tabs').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-panel]');
-      if (!btn) return;
-      switchPanel(btn.dataset.panel);
+      if (btn) showPanel(btn.dataset.panel);
     });
-
     document.getElementById('navList').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-panel]');
-      if (!btn) return;
-      switchPanel(btn.dataset.panel);
+      if (btn) showPanel(btn.dataset.panel);
     });
 
-    async function login() {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
       loginError.textContent = '';
       adminStatus.textContent = 'Connexion en cours...';
-      const email = document.getElementById('adminEmail').value.trim();
-      const password = document.getElementById('adminPassword').value;
-
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value.trim(), document.getElementById('adminPassword').value);
         adminStatus.textContent = '';
-      } catch (error) {
+      } catch {
         adminStatus.textContent = '';
         loginError.textContent = 'Connexion échouée';
       }
-    }
-
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      login();
     });
 
-    async function logout() {
-      await signOut(auth);
-    }
-
-    logoutBtn.addEventListener('click', logout);
-
+    logoutBtn.addEventListener('click', () => signOut(auth));
     saveAllBtn.addEventListener('click', async () => {
       await saveContent(data);
-      adminStatus.textContent = 'Contenu sauvegardé sur le site live.';
-      setTimeout(() => { adminStatus.textContent = ''; }, 2500);
-    });
-
-    refreshBtn.addEventListener('click', async () => {
-      await loadData();
-      adminStatus.textContent = 'Données rechargées.';
+      adminStatus.textContent = 'Contenu sauvegardé.';
       setTimeout(() => { adminStatus.textContent = ''; }, 1800);
     });
+    refreshBtn.addEventListener('click', loadData);
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -824,60 +1013,59 @@
         adminApp.style.display = 'none';
         return;
       }
-
       loginScreen.style.display = 'none';
-      adminApp.style.display = 'grid';
-
-      if (user.email !== ADMIN_EMAIL) {
-        adminStatus.textContent = 'Compte connecté : accès lecture/édition si autorisé par la base.';
-      }
-
-      try {
-        await loadData();
-      } catch (error) {
-        console.warn('Bootstrap failed, using empty content', error);
-        data = normalizeContent({});
-        hydrateBrandUI();
-        hydrateMediaUI();
-        render();
-      }
+      adminApp.style.display = 'block';
+      if (user.email !== ADMIN_EMAIL) adminStatus.textContent = 'Compte connecté avec accès limité.';
+      await loadData();
     });
 
     async function loadData() {
       data = normalizeContent(await loadContent());
-      hydrateBrandUI();
-      hydrateMediaUI();
-      render();
+      hydrateBrand();
+      hydrateMedia();
+      renderSelectors();
+      renderAll();
     }
 
-    function render() {
+    function renderSelectors() {
+      const catOptions = data.categories.map((c) => `<option value="${c.id}">${c.label?.fr || c.id}</option>`).join('');
+      const cityOptions = [...new Set(data.listings.map((l) => l.city).filter(Boolean))].map((c) => `<option value="${c}">${c}</option>`).join('');
+      el.filterCat.innerHTML = `<option value="">Toutes les catégories</option>${catOptions}`;
+      el.sortCategory.innerHTML = `<option value="">Toutes les catégories</option>${catOptions}`;
+      el.xmlDefaultCategory.innerHTML = `<option value="">Catégorie par défaut</option>${catOptions}`;
+      el.listCat.innerHTML = `<option value="">Choisir...</option>${catOptions}`;
+      el.filterCity.innerHTML = `<option value="">Toutes les villes</option>${cityOptions}`;
+      el.listCity.innerHTML = `<option value="">Choisir...</option>${cityOptions}`;
+      renderMediaTargets();
+    }
+
+    function renderAll() {
       const stats = {
-        total: data.listings.length,
+        listings: data.listings.length,
         cats: data.categories.length,
-        cities: new Set(data.listings.map((l) => l.city)).size,
+        cities: new Set(data.listings.map((l) => l.city).filter(Boolean)).size,
         featured: data.listings.filter((l) => l.featured).length
       };
 
-      document.getElementById('metricsGrid').innerHTML = `
-        <div class="metric"><div class="value">${stats.total}</div><div class="label">Listings</div></div>
-        <div class="metric"><div class="value">${stats.cats}</div><div class="label">Catégories</div></div>
-        <div class="metric"><div class="value">${stats.cities}</div><div class="label">Villes</div></div>
-        <div class="metric"><div class="value">${stats.featured}</div><div class="label">Featured</div></div>
+      el.metricsGrid.innerHTML = `
+        <div class="stat"><div class="value">${stats.listings}</div><div class="label">Listings</div></div>
+        <div class="stat"><div class="value">${stats.cats}</div><div class="label">Catégories</div></div>
+        <div class="stat"><div class="value">${stats.cities}</div><div class="label">Villes</div></div>
+        <div class="stat"><div class="value">${stats.featured}</div><div class="label">Featured</div></div>
       `;
 
-      document.getElementById('overviewMetrics').innerHTML = `
-        <div class="metric"><div class="value">${stats.total}</div><div class="label">Listings publiés</div></div>
-        <div class="metric"><div class="value">${stats.cats}</div><div class="label">Catégories actives</div></div>
-        <div class="metric"><div class="value">${stats.cities}</div><div class="label">Villes couvertes</div></div>
-        <div class="metric"><div class="value">${stats.featured}</div><div class="label">Mises en avant</div></div>
+      el.overviewMetrics.innerHTML = `
+        <div class="stat"><div class="value">${stats.listings}</div><div class="label">Listings publiés</div></div>
+        <div class="stat"><div class="value">${stats.cats}</div><div class="label">Catégories actives</div></div>
+        <div class="stat"><div class="value">${stats.cities}</div><div class="label">Villes couvertes</div></div>
+        <div class="stat"><div class="value">${stats.featured}</div><div class="label">Mises en avant</div></div>
       `;
 
-      const catCounts = data.listings.reduce((acc, listing) => {
-        acc[listing.cat] = (acc[listing.cat] || 0) + 1;
+      const catCounts = data.listings.reduce((acc, l) => {
+        acc[l.cat] = (acc[l.cat] || 0) + 1;
         return acc;
       }, {});
-
-      document.getElementById('catStats').innerHTML = data.categories.map((cat) => `
+      el.catStats.innerHTML = data.categories.map((cat) => `
         <tr>
           <td>${cat.id}</td>
           <td>${cat.label?.fr || ''}</td>
@@ -888,138 +1076,97 @@
       `).join('');
 
       renderListings();
+      renderSorting();
       renderHero();
       renderCats();
-      renderSorting();
-      renderMediaTargets();
-      updateInfo();
+      renderXmlPreview();
+    }
+
+    function getFilteredListings() {
+      const q = el.searchInput.value.trim().toLowerCase();
+      const cat = el.filterCat.value;
+      const city = el.filterCity.value;
+      const sort = el.filterSort.value;
+
+      let list = data.listings.filter((l) =>
+        (!q || `${l.name} ${l.city} ${l.description || l.desc || ''} ${l.address || ''}`.toLowerCase().includes(q)) &&
+        (!cat || l.cat === cat) &&
+        (!city || l.city === city)
+      );
+
+      list.sort((a, b) => {
+        if (sort === 'category') return (a.cat || '').localeCompare(b.cat || '') || (a.order || 0) - (b.order || 0);
+        if (sort === 'name') return (a.name || '').localeCompare(b.name || '');
+        if (sort === 'city') return (a.city || '').localeCompare(b.city || '');
+        if (sort === 'featured') return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (a.order || 0) - (b.order || 0);
+        return (a.order || 0) - (b.order || 0);
+      });
+
+      return list;
     }
 
     function renderListings() {
-      const cats = data.categories.map((c) => `<option value="${c.id}">${c.label.fr}</option>`).join('');
-      document.getElementById('listCat').innerHTML = `<option value="">Choisir...</option>${cats}`;
-      document.getElementById('filterCat').innerHTML = `<option value="">Toutes les catégories</option>${cats}`;
-
-      const cities = [...new Set(data.listings.map((l) => l.city))].filter(Boolean).map((c) => `<option value="${c}">${c}</option>`).join('');
-      document.getElementById('listCity').innerHTML = `<option value="">Choisir...</option>${cities}`;
-      document.getElementById('filterCity').innerHTML = `<option value="">Toutes les villes</option>${cities}`;
-
-      renderMediaTargets();
-      filterListings();
-    }
-
-    function filterListings() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      const c = document.getElementById('filterCat').value;
-      const cy = document.getElementById('filterCity').value;
-
-      const filtered = data.listings.filter((l) =>
-        (!q || `${l.name} ${l.city} ${l.description || ''}`.toLowerCase().includes(q)) &&
-        (!c || l.cat === c) &&
-        (!cy || l.city === cy)
-      );
-
-      document.getElementById('listingsTable').innerHTML = filtered.map((l) => `
+      el.listingsTable.innerHTML = getFilteredListings().map((l) => `
         <tr>
-          <td>
-            <strong>${l.name || '—'}</strong><br />
-            <small>${l.address || ''}</small>
-          </td>
+          <td><strong>${l.name || '—'}</strong><br><small>${l.address || ''}</small></td>
           <td>${l.cat || '—'}</td>
           <td>${l.city || '—'}</td>
+          <td>${l.order || 0}</td>
           <td>${l.featured ? '⭐ Oui' : '—'}</td>
           <td>
             <div class="row-actions">
-              <button class="mini-btn" onclick="editListing(${l.id})">Éditer</button>
-              <button class="mini-btn danger" onclick="deleteListing(${l.id})">Supprimer</button>
+              <button class="mini-btn" type="button" onclick="editListing(${l.id})">Éditer</button>
+              <button class="mini-btn danger" type="button" onclick="deleteListing(${l.id})">Supprimer</button>
             </div>
           </td>
         </tr>
       `).join('');
     }
 
-    function editListing(id) {
-      const l = data.listings.find((x) => x.id === id);
-      if (!l) return;
-      editing = id;
-      listName.value = l.name || '';
-      listCat.value = l.cat || '';
-      listCity.value = l.city || '';
-      listPhone.value = l.phone || '';
-      listAddr.value = l.address || '';
-      listDesc.value = l.description || '';
-      listLat.value = l.lat || '';
-      listLng.value = l.lng || '';
-      listOrder.value = l.order || '';
-      listFeat.checked = !!l.featured;
-      openModal('listingModal');
-    }
+    function renderSorting() {
+      const q = el.sortSearch.value.trim().toLowerCase();
+      const cat = el.sortCategory.value;
+      const mode = el.sortMode.value;
+      const dir = el.sortDirection.value;
 
-    function deleteListing(id) {
-      data.listings = data.listings.filter((l) => l.id !== id);
-      saveContent(data).then(render);
-    }
+      const filtered = data.listings.filter((l) => (!cat || l.cat === cat) && (!q || `${l.name} ${l.city} ${l.cat}`.toLowerCase().includes(q)));
+      filtered.sort((a, b) => {
+        let result = 0;
+        if (mode === 'category') result = (a.cat || '').localeCompare(b.cat || '') || (a.order || 0) - (b.order || 0);
+        else if (mode === 'name') result = (a.name || '').localeCompare(b.name || '');
+        else if (mode === 'city') result = (a.city || '').localeCompare(b.city || '');
+        else result = (a.order || 0) - (b.order || 0);
+        return dir === 'desc' ? -result : result;
+      });
 
-    function saveListing(e) {
-      e.preventDefault();
-      const next = {
-        id: editing || Date.now(),
-        name: listName.value,
-        cat: listCat.value,
-        city: listCity.value,
-        phone: listPhone.value,
-        address: listAddr.value,
-        description: listDesc.value,
-        lat: parseFloat(listLat.value) || null,
-        lng: parseFloat(listLng.value) || null,
-        order: parseInt(listOrder.value) || 0,
-        featured: listFeat.checked
-      };
-
-      if (editing) {
-        data.listings = data.listings.map((x) => x.id === editing ? next : x);
-      } else {
-        data.listings.push(next);
-      }
-
-      editing = null;
-      closeModal('listingModal');
-      saveContent(data).then(render);
+      el.sortableList.innerHTML = filtered.map((l) => `
+        <div class="sortable-item">
+          <div>
+            <strong>${l.name || '—'}</strong>
+            <div class="helper">${l.city || ''} · ${l.cat || ''}</div>
+          </div>
+          <div class="chip">Ordre ${l.order || 0}</div>
+        </div>
+      `).join('');
     }
 
     function renderHero() {
-      document.getElementById('heroTable').innerHTML = data.hero_slides.map((h, i) => `
+      el.heroTable.innerHTML = data.hero_slides.map((h, i) => `
         <tr>
           <td>${h.caption?.fr || h.text?.fr || ''}</td>
           <td>${h.caption?.en || h.text?.en || ''}</td>
           <td>${h.url || h.image || ''}</td>
           <td>
             <div class="row-actions">
-              <button class="mini-btn danger" onclick="deleteHero(${i})">Supprimer</button>
+              <button class="mini-btn danger" type="button" onclick="deleteHero(${i})">Supprimer</button>
             </div>
           </td>
         </tr>
       `).join('');
     }
 
-    function saveHero(e) {
-      e.preventDefault();
-      data.hero_slides.push({
-        id: Date.now(),
-        url: heroUrl.value.trim(),
-        caption: { fr: heroFR.value.trim(), en: heroEN.value.trim() }
-      });
-      closeModal('heroModal');
-      saveContent(data).then(render);
-    }
-
-    function deleteHero(i) {
-      data.hero_slides.splice(i, 1);
-      saveContent(data).then(render);
-    }
-
     function renderCats() {
-      document.getElementById('catTable').innerHTML = data.categories.map((c) => `
+      el.catTable.innerHTML = data.categories.map((c) => `
         <tr>
           <td>${c.id}</td>
           <td>${c.label?.fr || ''}</td>
@@ -1027,73 +1174,210 @@
           <td>${c.icon || ''}</td>
           <td>
             <div class="row-actions">
-              <button class="mini-btn" onclick="editCat('${c.id}')">Éditer</button>
-              <button class="mini-btn danger" onclick="deleteCat('${c.id}')">Supprimer</button>
+              <button class="mini-btn" type="button" onclick="editCat('${c.id}')">Éditer</button>
+              <button class="mini-btn danger" type="button" onclick="deleteCat('${c.id}')">Supprimer</button>
             </div>
           </td>
         </tr>
       `).join('');
     }
 
-    function editCat(id) {
-      const c = data.categories.find((x) => x.id === id);
-      if (!c) return;
-      editing = id;
-      catId.value = c.id || '';
-      catFR.value = c.label?.fr || '';
-      catEN.value = c.label?.en || '';
-      catIcon.value = c.icon || '';
-      openModal('catModal');
+    function renderXmlPreview() {
+      el.xmlPreview.textContent = xmlPayload ? xmlPayload.slice(0, 360) + (xmlPayload.length > 360 ? '…' : '') : 'Aucun XML chargé';
     }
 
-    function deleteCat(id) {
-      data.categories = data.categories.filter((c) => c.id !== id);
-      saveContent(data).then(render);
+    function hydrateBrand() {
+      el.brandLogoUrl.value = data.brand.logoUrl || '';
+      el.brandLogoAlt.value = data.brand.logoText || 'GabaoIndex';
+      el.brandIcon.value = data.brand.logoIcon || '🌿';
+      el.brandTaglineFr.value = data.brand.taglineFr || 'Le répertoire de référence au Gabon';
+      el.brandTaglineEn.value = data.brand.taglineEn || "Gabon's go-to directory";
+      updateBrandPreview();
     }
 
-    function saveCat(e) {
-      e.preventDefault();
-      const next = {
-        id: catId.value.trim(),
-        label: { fr: catFR.value.trim(), en: catEN.value.trim() },
-        icon: catIcon.value.trim()
+    function updateBrandPreview() {
+      const icon = el.brandIcon.value.trim() || '🌿';
+      const text = el.brandLogoAlt.value.trim() || 'GabaoIndex';
+      el.brandPreviewText.innerHTML = `${icon} ${text.replace('Index', '<strong>Index</strong>')}`;
+      const url = el.brandLogoUrl.value.trim();
+      el.brandLogoPreview.innerHTML = url ? `<img src="${url}" alt="Logo preview" />` : 'Aperçu du logo';
+    }
+
+    function hydrateMedia() {
+      el.cloudinaryUploadPreset.value = data.media?.cloudinaryUploadPreset || '';
+      el.cloudinaryCloudName.value = data.media?.cloudinaryCloudName || '';
+      el.establishmentMediaUrl.value = '';
+      renderMediaPreview('');
+    }
+
+    function renderMediaPreview(url) {
+      el.establishmentMediaPreview.innerHTML = url ? `<img src="${url}" alt="Media preview" />` : 'Aucun média sélectionné';
+    }
+
+    function renderMediaTargets() {
+      el.mediaTargetListing.innerHTML = data.listings.map((l) => `<option value="${l.id}">${l.name || '—'} — ${l.city || ''}</option>`).join('');
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+      if (id === 'listingModal') editingListingId = null;
+      if (id === 'catModal') editingCategoryId = null;
+      document.querySelector(`#${id} form`)?.reset();
+    }
+
+    async function uploadMedia(file, folder) {
+      const fileRef = ref(storage, `${folder}/${Date.now()}-${file.name}`);
+      const snapshot = await uploadBytes(fileRef, file);
+      return getDownloadURL(snapshot.ref);
+    }
+
+    function normalizeListing(next, existing = {}) {
+      const description = (next.description ?? next.desc ?? '').trim();
+      return {
+        ...existing,
+        id: existing.id ?? editingListingId ?? Date.now(),
+        name: next.name.trim(),
+        cat: next.cat,
+        city: next.city,
+        phone: next.phone.trim(),
+        address: next.address.trim(),
+        desc: description,
+        description,
+        lat: next.lat ? parseFloat(next.lat) : null,
+        lng: next.lng ? parseFloat(next.lng) : null,
+        order: next.order ? parseInt(next.order, 10) : 0,
+        featured: !!next.featured,
+        image: next.image || existing.image || ''
       };
+    }
 
-      if (editing) {
-        data.categories = data.categories.map((x) => x.id === editing ? next : x);
-      } else {
-        data.categories.push(next);
+    async function saveListing(e) {
+      e.preventDefault();
+      const file = el.listImageFile.files[0];
+      let image = el.listImageUrl.value.trim();
+      if (file) {
+        image = await uploadMedia(file, 'establishments/images');
       }
 
-      editing = null;
-      closeModal('catModal');
-      saveContent(data).then(render);
+      const existing = editingListingId ? data.listings.find((x) => x.id === editingListingId) : null;
+      const next = normalizeListing({
+        name: el.listName.value,
+        cat: el.listCat.value,
+        city: el.listCity.value,
+        phone: el.listPhone.value,
+        address: el.listAddr.value,
+        description: el.listDesc.value,
+        lat: el.listLat.value,
+        lng: el.listLng.value,
+        order: el.listOrder.value,
+        featured: el.listFeat.checked,
+        image
+      }, existing || {});
+
+      if (editingListingId) {
+        data.listings = data.listings.map((x) => x.id === editingListingId ? next : x);
+      } else {
+        data.listings.push(next);
+      }
+
+      editingListingId = null;
+      closeModal('listingModal');
+      await saveContent(data);
+      renderSelectors();
+      renderAll();
+      adminStatus.textContent = 'Listing sauvegardé.';
+      setTimeout(() => { adminStatus.textContent = ''; }, 1800);
     }
 
-    function renderSorting() {
-      document.getElementById('sortableList').innerHTML = data.listings
-        .sort((a, b) => (a.order || 0) - (b.order || 0))
-        .map((l) => `
-          <div class="item">
-            <div class="item-head">
-              <strong>${l.name || '—'}</strong>
-              <span class="muted">Ordre: ${l.order || 0}</span>
-            </div>
-            <div class="helper">${l.city || ''} · ${l.cat || ''}</div>
-          </div>
-        `).join('');
+    function editListing(id) {
+      const l = data.listings.find((x) => x.id === id);
+      if (!l) return;
+      editingListingId = id;
+      el.listName.value = l.name || '';
+      el.listCat.value = l.cat || '';
+      el.listCity.value = l.city || '';
+      el.listPhone.value = l.phone || '';
+      el.listAddr.value = l.address || '';
+      el.listDesc.value = l.description || l.desc || '';
+      el.listLat.value = l.lat ?? '';
+      el.listLng.value = l.lng ?? '';
+      el.listOrder.value = l.order ?? '';
+      el.listFeat.checked = !!l.featured;
+      el.listImageUrl.value = l.image || '';
+      openModal('listingModal');
     }
 
-    function saveSortOrder() {
-      data.listings = data.listings.map((l, index) => ({ ...l, order: index + 1 }));
+    function deleteListing(id) {
+      data.listings = data.listings.filter((l) => l.id !== id);
       saveContent(data).then(() => {
-        render();
-        alert('Ordre sauvegardé.');
+        renderSelectors();
+        renderAll();
       });
     }
 
-    async function bulkGeocode() {
-      document.getElementById('geocodeProgress').textContent = 'Géocodage manuel à connecter à votre logique de géocodage.';
+    async function saveHero(e) {
+      e.preventDefault();
+      data.hero_slides.push({
+        id: Date.now(),
+        url: el.heroUrl.value.trim(),
+        caption: { fr: el.heroFR.value.trim(), en: el.heroEN.value.trim() }
+      });
+      closeModal('heroModal');
+      await saveContent(data);
+      renderAll();
+    }
+    function deleteHero(i) {
+      data.hero_slides.splice(i, 1);
+      saveContent(data).then(renderAll);
+    }
+
+    async function saveCat(e) {
+      e.preventDefault();
+      const next = {
+        id: el.catId.value.trim(),
+        label: { fr: el.catFR.value.trim(), en: el.catEN.value.trim() },
+        icon: el.catIcon.value.trim()
+      };
+      if (editingCategoryId) data.categories = data.categories.map((x) => x.id === editingCategoryId ? next : x);
+      else data.categories.push(next);
+      editingCategoryId = null;
+      closeModal('catModal');
+      await saveContent(data);
+      renderSelectors();
+      renderAll();
+    }
+    function editCat(id) {
+      const c = data.categories.find((x) => x.id === id);
+      if (!c) return;
+      editingCategoryId = id;
+      el.catId.value = c.id || '';
+      el.catFR.value = c.label?.fr || '';
+      el.catEN.value = c.label?.en || '';
+      el.catIcon.value = c.icon || '';
+      openModal('catModal');
+    }
+    function deleteCat(id) {
+      data.categories = data.categories.filter((c) => c.id !== id);
+      saveContent(data).then(() => {
+        renderSelectors();
+        renderAll();
+      });
+    }
+
+    function saveSortOrder() {
+      const filtered = getFilteredListings();
+      data.listings = data.listings.map((l) => {
+        const idx = filtered.findIndex((f) => f.id === l.id);
+        return idx >= 0 ? { ...l, order: idx + 1 } : l;
+      });
+      saveContent(data).then(() => {
+        renderAll();
+        adminStatus.textContent = 'Ordre sauvegardé.';
+        setTimeout(() => { adminStatus.textContent = ''; }, 1800);
+      });
     }
 
     function validateData() {
@@ -1101,12 +1385,13 @@
       if (!data.listings.length) missing.push('Listings');
       if (!data.categories.length) missing.push('Catégories');
       if (!data.hero_slides.length) missing.push('Hero slides');
-      const box = document.getElementById('validationRes');
-      if (missing.length) {
-        box.innerHTML = `<div style="color:#92400e;background:#fef3c7;padding:12px 16px;border-radius:12px;">Manquants: ${missing.join(', ')}</div>`;
-      } else {
-        box.innerHTML = '<div style="color:#065f46;background:#d1fae5;padding:12px 16px;border-radius:12px;">Toutes les données essentielles sont présentes.</div>';
-      }
+      el.validationRes.innerHTML = missing.length
+        ? `<div style="color:#92400e;background:#fef3c7;padding:12px 16px;border-radius:12px;">Manquants: ${missing.join(', ')}</div>`
+        : '<div style="color:#065f46;background:#d1fae5;padding:12px 16px;border-radius:12px;">Toutes les données essentielles sont présentes.</div>';
+    }
+
+    function bulkGeocode() {
+      el.geocodeProgress.textContent = 'Géocodage manuel à connecter à votre logique de géocodage.';
     }
 
     function createBackup() {
@@ -1117,116 +1402,41 @@
       a.click();
     }
 
-    function restoreBackup() {
-      document.getElementById('restoreFile').click();
-    }
+    function restoreBackup() { el.restoreFile.click(); }
 
-    document.getElementById('restoreFile').addEventListener('change', function (e) {
+    el.restoreFile.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         data = normalizeContent(JSON.parse(ev.target.result));
-        saveContent(data).then(render);
+        await saveContent(data);
+        renderSelectors();
+        renderAll();
       };
       reader.readAsText(file);
     });
 
-    function openModal(id) {
-      document.getElementById(id).classList.add('active');
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
-      editing = null;
-      const form = document.querySelector(`#${id} form`);
-      form?.reset();
-    }
-
-    async function uploadMedia(file, folder) {
-      const fileRef = ref(storage, `${folder}/${Date.now()}-${file.name}`);
-      const snapshot = await uploadBytes(fileRef, file);
-      return getDownloadURL(snapshot.ref);
-    }
-
-    function hydrateBrandUI() {
-      brandLogoUrl.value = data.brand.logoUrl || '';
-      brandLogoAlt.value = data.brand.logoText || 'GabaoIndex';
-      brandIcon.value = data.brand.logoIcon || '🌿';
-      brandTaglineFr.value = data.brand.taglineFr || 'Le répertoire de référence au Gabon';
-      brandTaglineEn.value = data.brand.taglineEn || "Gabon's go-to directory";
-      updateBrandPreview();
-    }
-
-    function hydrateMediaUI() {
-      cloudinaryUploadPreset.value = data.media?.cloudinaryUploadPreset || '';
-      cloudinaryCloudName.value = data.media?.cloudinaryCloudName || '';
-      establishmentMediaUrl.value = '';
-      renderMediaPreview('');
-    }
-
-    function updateBrandPreview() {
-      const icon = brandIcon.value.trim() || '🌿';
-      const text = brandLogoAlt.value.trim() || 'GabaoIndex';
-      brandPreviewText.innerHTML = `${icon} ${text.replace('Index', '<strong>Index</strong>')}`;
-      const url = brandLogoUrl.value.trim();
-      brandLogoPreview.innerHTML = url ? `<img src="${url}" alt="Logo preview" />` : 'Aperçu du logo';
-    }
-
-    function renderMediaPreview(url) {
-      establishmentMediaPreview.innerHTML = url ? `<img src="${url}" alt="Media preview" />` : 'Aucun média sélectionné';
-    }
-
-    function renderMediaTargets() {
-      mediaTargetListing.innerHTML = data.listings.map((l) => `<option value="${l.id}">${l.name} — ${l.city}</option>`).join('');
-    }
-
-    brandLogoUrl.addEventListener('input', updateBrandPreview);
-    brandLogoAlt.addEventListener('input', updateBrandPreview);
-    brandIcon.addEventListener('input', updateBrandPreview);
-
-    brandLogoFile.addEventListener('change', () => {
-      const file = brandLogoFile.files[0];
-      if (file) brandLogoPreview.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Logo preview" />`;
-    });
-
-    establishmentMediaFile.addEventListener('change', () => {
-      const file = establishmentMediaFile.files[0];
-      if (file) renderMediaPreview(URL.createObjectURL(file));
-    });
-
-    async function uploadBrandLogo(provider) {
-      const file = brandLogoFile.files[0];
+    async function uploadBrandLogo() {
+      const file = el.brandLogoFile.files[0];
       if (!file) return alert('Sélectionnez un fichier logo.');
-      let url = '';
-      if (provider === 'firebase') {
-        url = await uploadMedia(file, 'brand/logos');
-      } else {
-        const cloudName = cloudinaryCloudName.value.trim();
-        const preset = cloudinaryUploadPreset.value.trim();
-        if (!cloudName || !preset) return alert('Cloudinary cloud name et upload preset requis.');
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', preset);
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
-        const result = await response.json();
-        url = result.secure_url;
-      }
-      brandLogoUrl.value = url;
-      data.brand.logoUrl = url;
+      const url = await uploadMedia(file, 'brand/logos');
+      el.brandLogoUrl.value = url;
       updateBrandPreview();
+      data.brand.logoUrl = url;
       await saveContent(data);
     }
 
     async function uploadEstablishmentMedia(provider) {
-      const file = establishmentMediaFile.files[0];
-      if (!file) return alert('Sélectionnez un fichier image/logo.');
-      let url = '';
-      if (provider === 'firebase') {
+      const file = el.establishmentMediaFile.files[0];
+      if (!file && !el.establishmentMediaUrl.value.trim()) return alert('Sélectionnez un fichier ou saisissez une URL.');
+      let url = el.establishmentMediaUrl.value.trim();
+      if (file && provider === 'firebase') {
         url = await uploadMedia(file, 'establishments/media');
-      } else {
-        const cloudName = cloudinaryCloudName.value.trim();
-        const preset = cloudinaryUploadPreset.value.trim();
+      }
+      if (provider === 'cloudinary') {
+        const cloudName = el.cloudinaryCloudName.value.trim();
+        const preset = el.cloudinaryUploadPreset.value.trim();
         if (!cloudName || !preset) return alert('Cloudinary cloud name et upload preset requis.');
         const formData = new FormData();
         formData.append('file', file);
@@ -1235,64 +1445,149 @@
         const result = await response.json();
         url = result.secure_url;
       }
-      establishmentMediaUrl.value = url;
+      el.establishmentMediaUrl.value = url;
       data.media.lastUploadedUrl = url;
       data.media.lastUploadedAt = new Date().toISOString();
       renderMediaPreview(url);
       await saveContent(data);
     }
 
-    async function saveBrandLayout() {
+    async function applyMediaToListing() {
+      const listingId = el.mediaTargetListing.value;
+      const mediaType = el.mediaTargetType.value;
+      const url = el.establishmentMediaUrl.value.trim();
+      if (!listingId || !url) return alert('Sélectionnez un listing et chargez un média.');
+      data.listings = data.listings.map((l) => String(l.id) === String(listingId) ? { ...l, [mediaType]: url, image: mediaType === 'image' ? url : (l.image || url) } : l);
+      await saveContent(data);
+      renderSelectors();
+      renderAll();
+    }
+
+    function importXmlListings(xmlText) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(xmlText, 'application/xml');
+      return [...doc.querySelectorAll('listing')].map((node) => ({
+        id: Date.now() + Math.random(),
+        name: node.querySelector('name')?.textContent?.trim() || '',
+        cat: node.querySelector('category')?.textContent?.trim() || el.xmlDefaultCategory.value || '',
+        city: node.querySelector('city')?.textContent?.trim() || '',
+        phone: node.querySelector('phone')?.textContent?.trim() || '',
+        address: node.querySelector('address')?.textContent?.trim() || '',
+        description: node.querySelector('description')?.textContent?.trim() || '',
+        lat: parseFloat(node.querySelector('lat')?.textContent || '') || null,
+        lng: parseFloat(node.querySelector('lng')?.textContent || '') || null,
+        order: parseInt(node.querySelector('order')?.textContent || '0', 10) || 0,
+        featured: (node.querySelector('featured')?.textContent || '').trim() === 'true',
+        image: node.querySelector('image')?.textContent?.trim() || ''
+      }));
+    }
+
+    async function importXmlFile() {
+      const file = el.xmlFileInput.files[0];
+      if (!file) return alert('Choisissez un fichier XML.');
+      const text = await file.text();
+      xmlPayload = text;
+      renderXmlPreview();
+      const items = importXmlListings(text);
+      if (!items.length) return alert('Aucun listing trouvé dans le XML.');
+      data.listings.push(...items);
+      await saveContent(data);
+      renderSelectors();
+      renderAll();
+      alert(`${items.length} listings importés.`);
+    }
+
+    function downloadXmlExample() {
+      const example = `<?xml version="1.0" encoding="UTF-8"?><listings><listing><name>Exemple Gabao</name><category>restaurants</category><city>Libreville</city><phone>+24100000000</phone><address>Centre-ville</address><description>Exemple d'import XML.</description><lat>-0.39</lat><lng>9.45</lng><order>1</order><featured>true</featured><image>/img/slide1.png</image></listing></listings>`;
+      const blob = new Blob([example], { type: 'application/xml' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'xml-import-example.xml';
+      a.click();
+    }
+
+    function openXmlPanel() { showPanel('xml'); }
+
+    el.searchInput.addEventListener('input', renderListings);
+    el.filterCat.addEventListener('change', renderListings);
+    el.filterCity.addEventListener('change', renderListings);
+    el.filterSort.addEventListener('change', renderListings);
+    el.clearFiltersBtn.addEventListener('click', () => {
+      el.searchInput.value = '';
+      el.filterCat.value = '';
+      el.filterCity.value = '';
+      el.filterSort.value = 'order';
+      renderListings();
+    });
+
+    el.sortCategory.addEventListener('change', renderSorting);
+    el.sortMode.addEventListener('change', renderSorting);
+    el.sortDirection.addEventListener('change', renderSorting);
+    el.sortSearch.addEventListener('input', renderSorting);
+    el.saveSortBtn.addEventListener('click', saveSortOrder);
+
+    el.newListingBtn.addEventListener('click', () => { editingListingId = null; openModal('listingModal'); });
+    el.newHeroBtn.addEventListener('click', () => openModal('heroModal'));
+    el.newCatBtn.addEventListener('click', () => { editingCategoryId = null; openModal('catModal'); });
+    el.openXmlBtn.addEventListener('click', openXmlPanel);
+    el.importXmlBtn.addEventListener('click', importXmlFile);
+    el.downloadXmlExampleBtn.addEventListener('click', downloadXmlExample);
+    el.uploadFirebaseBtn.addEventListener('click', () => uploadEstablishmentMedia('firebase'));
+    el.uploadCloudinaryBtn.addEventListener('click', () => uploadEstablishmentMedia('cloudinary'));
+    el.applyMediaBtn.addEventListener('click', applyMediaToListing);
+    el.saveBrandBtn.addEventListener('click', async () => {
       data.brand = {
         ...data.brand,
-        logoUrl: brandLogoUrl.value.trim(),
-        logoText: brandLogoAlt.value.trim(),
-        logoIcon: brandIcon.value.trim(),
-        taglineFr: brandTaglineFr.value.trim(),
-        taglineEn: brandTaglineEn.value.trim()
+        logoUrl: el.brandLogoUrl.value.trim(),
+        logoText: el.brandLogoAlt.value.trim(),
+        logoIcon: el.brandIcon.value.trim(),
+        taglineFr: el.brandTaglineFr.value.trim(),
+        taglineEn: el.brandTaglineEn.value.trim()
       };
       await saveContent(data);
-      alert('Identité sauvegardée et appliquée au site live.');
-    }
+      alert('Identité sauvegardée.');
+    });
+    el.validateBtn.addEventListener('click', validateData);
+    el.geocodeBtn.addEventListener('click', bulkGeocode);
+    el.backupBtn.addEventListener('click', createBackup);
+    el.restoreBtn.addEventListener('click', restoreBackup);
+    el.refreshBtn?.addEventListener('click', loadData);
 
-    function applyMediaToListing() {
-      const listingId = mediaTargetListing.value;
-      const mediaType = mediaTargetType.value;
-      const url = establishmentMediaUrl.value.trim();
-      if (!listingId || !url) return alert('Sélectionnez un listing et chargez un média.');
-      data.listings = data.listings.map((l) => String(l.id) === String(listingId) ? { ...l, [mediaType]: url } : l);
-      saveContent(data).then(render);
-      alert('Média appliqué au listing.');
-    }
+    ['brandLogoUrl','brandLogoAlt','brandIcon'].forEach((id) => document.getElementById(id).addEventListener('input', updateBrandPreview));
 
-    function updateInfo() {}
+    el.brandLogoFile.addEventListener('change', () => {
+      const file = el.brandLogoFile.files[0];
+      if (file) el.brandLogoPreview.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Logo preview" />`;
+    });
+    el.establishmentMediaFile.addEventListener('change', () => {
+      const file = el.establishmentMediaFile.files[0];
+      if (file) renderMediaPreview(URL.createObjectURL(file));
+    });
+    el.xmlFileInput.addEventListener('change', async () => {
+      const file = el.xmlFileInput.files[0];
+      if (!file) return;
+      xmlPayload = await file.text();
+      renderXmlPreview();
+    });
 
-    window.login = login;
-    window.logout = logout;
-    window.goTab = switchPanel;
-    window.filterListings = filterListings;
+    document.getElementById('listingForm').addEventListener('submit', saveListing);
+    document.getElementById('heroForm').addEventListener('submit', saveHero);
+    document.getElementById('catForm').addEventListener('submit', saveCat);
+
+    document.getElementById('closeListingModalBtn').addEventListener('click', () => closeModal('listingModal'));
+    document.getElementById('closeHeroModalBtn').addEventListener('click', () => closeModal('heroModal'));
+    document.getElementById('closeCatModalBtn').addEventListener('click', () => closeModal('catModal'));
+    document.getElementById('cancelListingBtn').addEventListener('click', () => closeModal('listingModal'));
+    document.getElementById('cancelHeroBtn').addEventListener('click', () => closeModal('heroModal'));
+    document.getElementById('cancelCatBtn').addEventListener('click', () => closeModal('catModal'));
+
     window.editListing = editListing;
     window.deleteListing = deleteListing;
-    window.saveListing = saveListing;
-    window.renderHero = renderHero;
-    window.saveHero = saveHero;
-    window.deleteHero = deleteHero;
-    window.renderCats = renderCats;
     window.editCat = editCat;
     window.deleteCat = deleteCat;
-    window.saveCat = saveCat;
-    window.saveSortOrder = saveSortOrder;
-    window.bulkGeocode = bulkGeocode;
-    window.validateData = validateData;
-    window.createBackup = createBackup;
-    window.restoreBackup = restoreBackup;
+    window.deleteHero = deleteHero;
     window.openModal = openModal;
     window.closeModal = closeModal;
-    window.updateInfo = updateInfo;
-    window.saveBrandLayout = saveBrandLayout;
-    window.uploadBrandLogo = uploadBrandLogo;
-    window.uploadEstablishmentMedia = uploadEstablishmentMedia;
-    window.applyMediaToListing = applyMediaToListing;
   </script>
 </body>
 </html>

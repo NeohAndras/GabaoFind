@@ -1,0 +1,28 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0 Courier New;}}\f0\fs20
+GabaoIndex admin rework roadmap\par
+\par
+Goals from the request:\par
+- Reduce duplicate controls and make admin navigation lighter.\par
+- Fix media upload so selected files are uploaded to Firebase Storage, linked to the correct listing image field, and persisted in the shared content source.\par
+- Improve listing discovery for large catalogs with better search, sorting, category filtering, and quicker edit entry points.\par
+- Add direct image insertion in the edit-listing form near the latitude/longitude fields.\par
+- Fix sorting, including sorting by category and by custom order.\par
+- Add a mobile-first admin layout for editing on the go.\par
+- Add bulk XML import support and provide a root-level example XML file.\par
+- Keep this roadmap in task-note and update it as the admin work progresses.\par
+\par
+Implementation phases:\par
+1. Audit current admin/content contract and identify every field used by the public site.\par
+2. Simplify the admin HTML into a smaller set of actions and panels.\par
+3. Add a better listing browser with search, category sort, order sort, and quick edit targets.\par
+4. Rework media handling so uploads write to Firebase Storage and update listing fields.\par
+5. Extend listing edit modal with image URL + file upload controls near coordinates.\par
+6. Fix custom ordering and add category-aware sorting.\par
+7. Add a mobile layout optimized for quick edits and large-touch controls.\par
+8. Add XML bulk import example + parser flow and wire it into the admin UI.\par
+9. Verify data persistence and public-site propagation after each major change.\par
+\par
+Current status:\par
+- Requirements captured.\par
+- Next step is admin UI/data model refactor.\par
+}

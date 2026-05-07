@@ -16,7 +16,7 @@ let HERO_SLIDES = [];
 let CATEGORIES = [];
 let LISTINGS = [];
 let BRAND = {
-  logoUrl: '/img/Logo-Index.webp',
+  logoUrl: '/img/Logo-index.webp',
   logoText: 'GabaoIndex',
   logoIcon: '🌿',
   taglineFr: 'Le répertoire de référence au Gabon',
@@ -100,7 +100,7 @@ function getFiltered() {
 function renderBrand() {
   const logoText = BRAND.logoText || 'GabaoIndex';
   const logoIcon = BRAND.logoIcon || '🌿';
-  const logoUrl = BRAND.logoUrl || '/img/Logo-Index.webp';
+  const logoUrl = BRAND.logoUrl || '/img/Logo-index.webp';
   const logoHtml = logoUrl
     ? `<img src="${logoUrl}" alt="${logoText}" class="logo-image" />`
     : `<span class="logo-icon">${logoIcon}</span>`;
@@ -208,10 +208,11 @@ function renderListings() {
       </div>`;
     }
     const cat = getCatMeta(l.cat);
+    const listingImage = l.image || l.img || l.coverImage || l.logo || l.photo || '';
     return `
     <div class="listing-card" data-id="${l.id}" style="animation-delay:${i * 0.04}s" tabindex="0" role="button" aria-label="${l.name}">
       <div class="card-img">
-        ${l.emoji}
+        ${listingImage ? `<img src="${listingImage}" alt="${l.name}" loading="lazy">` : l.emoji}
         ${l.featured ? '<span class="card-badge">⭐ Recommandé</span>' : ''}
       </div>
       <div class="card-body">
@@ -277,25 +278,33 @@ function reviewCardHtml(review) {
   const author = review.authorName || (i18n.lang === 'fr' ? 'Utilisateur' : 'User');
   const dateLabel = formatReviewDate(review.createdAt);
   return `
-    <div class="review-item" style="padding:12px 0; border-top:1px solid var(--border);">
-      <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:6px;">
-        <strong style="color:var(--text-primary);">${escapeHtml(author)}</strong>
-        <span style="color:var(--accent); font-size:.9rem; white-space:nowrap;">${stars}</span>
+    <article class="review-card">
+      <div class="review-card-head">
+        <div class="review-card-meta">
+          <strong>${escapeHtml(author)}</strong>
+          ${dateLabel ? `<span>${escapeHtml(dateLabel)}</span>` : ''}
+        </div>
+        <span class="review-stars" aria-label="${review.rating || 0} / 5">${stars}</span>
       </div>
-      <div style="color:var(--text-muted); font-size:.9rem; line-height:1.6;">${escapeHtml(review.comment)}</div>
-      ${dateLabel ? `<div style="margin-top:6px; color:var(--text-muted); font-size:.78rem;">${escapeHtml(dateLabel)}</div>` : ''}
-    </div>
+      <div class="review-card-body">${escapeHtml(review.comment)}</div>
+    </article>
   `;
 }
 
 async function loadReviews(listingId) {
   try {
-    const q = query(collection(db, 'reviews'), where('listingId', '==', listingId), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, 'reviews'), where('listingId', '==', listingId));
     const snapshot = await getDocs(q);
-    reviewsByListingId[listingId] = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    reviewsByListingId[listingId] = snapshot.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => {
+        const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt || 0).getTime();
+        const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt || 0).getTime();
+        return bTime - aTime;
+      });
   } catch (error) {
     console.warn('Failed to load reviews', error);
-    reviewsByListingId[listingId] = [];
+    reviewsByListingId[listingId] = reviewsByListingId[listingId] || [];
   }
 }
 
@@ -307,23 +316,38 @@ async function submitReview(listingId, form) {
 
   const rating = Number(form.rating.value);
   const comment = form.comment.value.trim();
-  if (!rating || rating < 1 || rating > 5 || comment.length < 10) {
-    alert(i18n.lang === 'fr' ? 'Ajoutez une note et un commentaire d’au moins 10 caractères.' : 'Add a rating and a comment with at least 10 characters.');
+
+  if (!rating || rating < 1 || rating > 5) {
+    alert(i18n.lang === 'fr' ? 'Touchez une étoile pour noter ce lieu.' : 'Tap a star to rate this place.');
     return;
   }
 
-  await addDoc(collection(db, 'reviews'), {
+  const reviewData = {
     listingId,
     rating,
     comment,
     authorUid: currentUser.uid,
     authorName: currentUser.displayName || currentUser.email || 'User',
     authorEmail: currentUser.email || '',
+    createdAt: new Date().toISOString()
+  };
+
+  const docRef = await addDoc(collection(db, 'reviews'), {
+    ...reviewData,
     createdAt: serverTimestamp()
   });
 
-  form.reset();
+  reviewsByListingId[listingId] = [
+    {
+      id: docRef.id,
+      ...reviewData,
+      createdAt: new Date()
+    },
+    ...(reviewsByListingId[listingId] || [])
+  ];
+
   await loadReviews(listingId);
+  form.reset();
   openModal(listingId);
 }
 
@@ -331,39 +355,50 @@ function renderReviewSection(listingId) {
   const listingReviews = reviewsByListingId[listingId] || [];
   const reviewsHtml = listingReviews.length
     ? listingReviews.map(reviewCardHtml).join('')
-    : `<div style="color:var(--text-muted); padding:12px 0;">${i18n.lang === 'fr' ? 'Aucun avis pour le moment.' : 'No reviews yet.'}</div>`;
+    : `<div class="review-empty-note">${i18n.lang === 'fr' ? 'Aucun avis pour le moment.' : 'No reviews yet.'}</div>`;
 
   const loginPrompt = currentUser
-    ? `<div style="font-size:.88rem; color:var(--text-secondary); margin-bottom:8px;">${escapeHtml(currentUser.displayName || currentUser.email || 'Connected user')}</div>`
-    : `<button type="button" class="btn-primary" id="reviewLoginBtn" style="width:100%; margin-top:10px;">${i18n.lang === 'fr' ? 'Se connecter pour commenter' : 'Log in to review'}</button>`;
+    ? `<div class="review-user-chip">${escapeHtml(currentUser.displayName || currentUser.email || 'Connected user')}</div>`
+    : `<button type="button" class="btn-primary review-login-btn" id="reviewLoginBtn">${i18n.lang === 'fr' ? 'Se connecter pour commenter' : 'Log in to review'}</button>`;
 
   const formHtml = currentUser ? `
-    <form id="reviewForm" style="display:grid; gap:12px; margin-top:14px;">
-      <label style="display:grid; gap:8px; color:var(--text-secondary); font-size:.9rem;">
-        ${i18n.lang === 'fr' ? 'Note' : 'Rating'}
-        <select name="rating" required style="padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--bg-card); color:var(--text-primary);">
-          <option value="">${i18n.lang === 'fr' ? 'Choisir' : 'Choose'}</option>
-          <option value="5">5 ★</option>
-          <option value="4">4 ★</option>
-          <option value="3">3 ★</option>
-          <option value="2">2 ★</option>
-          <option value="1">1 ★</option>
-        </select>
-      </label>
-      <textarea name="comment" required minlength="10" placeholder="${i18n.lang === 'fr' ? 'Écrivez votre avis après l’itinéraire...' : 'Write your review after the directions...'}" style="min-height:110px; padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--bg-card); color:var(--text-primary);"></textarea>
-      <button type="submit" class="btn-primary" style="padding:12px 16px; border:none; border-radius:10px; font-weight:700;">${i18n.lang === 'fr' ? 'Publier l’avis' : 'Post review'}</button>
+    <form id="reviewForm" class="review-form">
+      <div class="review-form-head">
+        <div>
+          <div class="review-form-title">${i18n.lang === 'fr' ? 'Donnez votre avis' : 'Leave your review'}</div>
+          <div class="review-form-sub">${i18n.lang === 'fr' ? 'Touchez une étoile pour noter ce lieu' : 'Tap a star to rate this place'}</div>
+        </div>
+      </div>
+      <fieldset class="star-picker" aria-label="${i18n.lang === 'fr' ? 'Choisir une note' : 'Choose a rating'}">
+        <legend class="sr-only">${i18n.lang === 'fr' ? 'Choisir une note' : 'Choose a rating'}</legend>
+        <input type="radio" name="rating" id="rating-5-${listingId}" value="5" required />
+        <label for="rating-5-${listingId}" title="5 stars">★</label>
+        <input type="radio" name="rating" id="rating-4-${listingId}" value="4" />
+        <label for="rating-4-${listingId}" title="4 stars">★</label>
+        <input type="radio" name="rating" id="rating-3-${listingId}" value="3" />
+        <label for="rating-3-${listingId}" title="3 stars">★</label>
+        <input type="radio" name="rating" id="rating-2-${listingId}" value="2" />
+        <label for="rating-2-${listingId}" title="2 stars">★</label>
+        <input type="radio" name="rating" id="rating-1-${listingId}" value="1" />
+        <label for="rating-1-${listingId}" title="1 star">★</label>
+      </fieldset>
+      <textarea name="comment" required minlength="10" placeholder="${i18n.lang === 'fr' ? 'Écrivez votre avis...' : 'Write your review...'}"></textarea>
+      <button type="submit" class="btn-primary review-submit">${i18n.lang === 'fr' ? 'Publier l’avis' : 'Post review'}</button>
     </form>
-  ` : `<div style="color:var(--text-muted); font-size:.88rem; margin-top:12px;">${i18n.lang === 'fr' ? 'Les avis sont publics. Connectez-vous pour commenter.' : 'Reviews are public. Log in to comment.'}</div>`;
+  ` : `<div class="review-empty-note">${i18n.lang === 'fr' ? 'Les avis sont publics. Connectez-vous pour commenter.' : 'Reviews are public. Log in to comment.'}</div>`;
 
   return `
-    <div class="modal-review-section" style="margin-top:22px; padding-top:18px; border-top:1px solid var(--border);">
-      <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap;">
-        <h3 style="margin:0; color:var(--text-primary);">${i18n.lang === 'fr' ? 'Avis & commentaires' : 'Reviews & comments'}</h3>
-        <span style="color:var(--text-muted); font-size:.9rem;">${listingReviews.length} ${i18n.lang === 'fr' ? 'avis' : 'reviews'}</span>
+    <div class="modal-review-section">
+      <div class="modal-review-header">
+        <div>
+          <h3>${i18n.lang === 'fr' ? 'Avis & commentaires' : 'Reviews & comments'}</h3>
+          <p>${i18n.lang === 'fr' ? 'Consultez les retours et partagez le vôtre' : 'Read the feedback and share yours'}</p>
+        </div>
+        <span class="modal-review-count">${listingReviews.length} ${i18n.lang === 'fr' ? 'avis' : 'reviews'}</span>
       </div>
       ${loginPrompt}
       ${formHtml}
-      <div style="margin-top:14px;">
+      <div class="review-list">
         ${reviewsHtml}
       </div>
     </div>
@@ -375,7 +410,7 @@ function openModal(id) {
   if (!l) return;
   const cat = getCatMeta(l.cat);
   document.getElementById('modalContent').innerHTML = `
-    <span class="modal-emoji">${l.emoji}</span>
+    <span class="modal-emoji">${l.image || l.img || l.coverImage || l.logo || l.photo ? `<img src="${l.image || l.img || l.coverImage || l.logo || l.photo}" alt="${l.name}" style="width:100%;max-width:220px;height:auto;border-radius:18px;object-fit:cover;" loading="lazy" />` : l.emoji}</span>
     <div class="modal-title">${l.name}</div>
     <div class="modal-cat">${cat.icon} ${cat.label[i18n.lang]} · ${l.city}</div>
     <div class="modal-stars"></div>
@@ -584,7 +619,7 @@ async function loadSiteContent() {
     BRAND = {
       ...BRAND,
       ...stored.brand,
-      logoUrl: stored.brand?.logoUrl || BRAND.logoUrl || '/img/Logo-Index.webp'
+      logoUrl: stored.brand?.logoUrl || BRAND.logoUrl || '/img/Logo-index.webp'
     };
   } catch (error) {
     console.warn('Content load failed, falling back to bundled data.json', error);
@@ -596,7 +631,7 @@ async function loadSiteContent() {
     BRAND = {
       ...BRAND,
       ...data.brand,
-      logoUrl: data.brand?.logoUrl || BRAND.logoUrl || '/img/Logo-Index.webp'
+      logoUrl: data.brand?.logoUrl || BRAND.logoUrl || '/img/Logo-index.webp'
     };
   }
 }
@@ -659,9 +694,6 @@ async function init() {
         window.location.href = currentUser.email === ADMIN_EMAIL ? '/admin.html' : '/profile.html';
       } else {
         await handleLoginClick();
-        if (currentUser) {
-          window.location.href = currentUser.email === ADMIN_EMAIL ? '/admin.html' : '/profile.html';
-        }
       }
     });
     initHero();

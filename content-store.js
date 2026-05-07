@@ -4,10 +4,16 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/fi
 
 export const CONTENT_DOC = doc(db, 'site_content', 'main');
 const LOCAL_CACHE_KEY = 'gabaoindex:site_content:main';
+const LOCAL_CACHE_VERSION = 2;
+const LOCAL_CACHE_TTL_MS = 1000 * 60 * 60 * 12;
 
 export function normalizeContent(stored = {}) {
+  const listings = Array.isArray(stored.listings) ? stored.listings : [];
   return {
-    listings: Array.isArray(stored.listings) ? stored.listings : [],
+    listings: listings.map((listing) => ({
+      ...listing,
+      image: listing.image || listing.img || listing.logo || listing.coverImage || listing.photo || ''
+    })),
     categories: Array.isArray(stored.categories) ? stored.categories : [],
     hero_slides: Array.isArray(stored.hero_slides) ? stored.hero_slides : [],
     brand: stored.brand && typeof stored.brand === 'object' ? stored.brand : {},
@@ -19,7 +25,18 @@ function readLocalCache() {
   try {
     const raw = localStorage.getItem(LOCAL_CACHE_KEY);
     if (!raw) return null;
-    return normalizeContent(JSON.parse(raw));
+
+    const cached = JSON.parse(raw);
+    const cachedAt = Number(cached.cachedAt || 0);
+    const version = Number(cached.version || 0);
+    const isExpired = !cachedAt || Date.now() - cachedAt > LOCAL_CACHE_TTL_MS;
+
+    if (version !== LOCAL_CACHE_VERSION || isExpired) {
+      localStorage.removeItem(LOCAL_CACHE_KEY);
+      return null;
+    }
+
+    return normalizeContent(cached);
   } catch {
     return null;
   }
@@ -27,7 +44,11 @@ function readLocalCache() {
 
 function writeLocalCache(data) {
   try {
-    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify({ ...data, cachedAt: Date.now() }));
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify({
+      ...data,
+      version: LOCAL_CACHE_VERSION,
+      cachedAt: Date.now()
+    }));
   } catch {
     // Ignore cache write failures
   }
@@ -51,7 +72,11 @@ async function fetchFirestoreData() {
 }
 
 async function fetchBestOnlineContent() {
-  const sources = [fetchApiData, fetchFirestoreData, fetchBundledData];
+  const isStaticPreview = typeof window !== 'undefined' && window.location && window.location.port === '3000';
+  const sources = isStaticPreview
+    ? [fetchBundledData, fetchFirestoreData]
+    : [fetchFirestoreData, fetchApiData, fetchBundledData];
+
   let lastError = null;
 
   for (const source of sources) {

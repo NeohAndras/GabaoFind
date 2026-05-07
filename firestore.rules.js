@@ -17,6 +17,14 @@ service cloud.firestore {
                          request.auth.token.email == 'admin@gabaoindex.com';
     }
     
+    // Reviews: public read, authenticated create
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null &&
+                            request.auth.uid == resource.data.authorUid;
+    }
+    
     // Admin logs: admin only
     match /admin_logs/{logId} {
       allow read, write: if request.auth != null &&
